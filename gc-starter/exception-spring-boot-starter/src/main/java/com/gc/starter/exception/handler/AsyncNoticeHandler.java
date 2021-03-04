@@ -2,7 +2,10 @@ package com.gc.starter.exception.handler;
 
 import com.gc.auth.core.data.RestUserDetails;
 import com.gc.starter.exception.notice.ExceptionNotice;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,16 +17,13 @@ import java.util.Map;
  * 2020/11/15 12:21 上午
  */
 @Async
-public class AsyncNoticeHandler {
+public class AsyncNoticeHandler implements ApplicationContextAware {
 
     /**
      * spring 上下文
      */
-    private final ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
-    public AsyncNoticeHandler(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     /**
      * 进行异常通知
@@ -35,8 +35,11 @@ public class AsyncNoticeHandler {
         // 获取所有通知器
         Map<String, ExceptionNotice> noticeMap = applicationContext.getBeansOfType(ExceptionNotice.class);
         // 执行通知
-        noticeMap.forEach((key, notice) -> {
-            notice.notice(e, user, request);
-        });
+        noticeMap.forEach((key, notice) -> notice.notice(e, user, request));
+    }
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

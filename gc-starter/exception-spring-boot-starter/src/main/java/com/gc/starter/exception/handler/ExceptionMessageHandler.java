@@ -17,5 +17,5 @@ public interface ExceptionMessageHandler {
      * @param request HttpServletRequest
      * @return 信息
      */
-    Object message(Exception e, @Nullable HttpServletRequest request);
+    Object message(Exception e, @Nullable HttpServletRequest request) throws Exception;
 }
