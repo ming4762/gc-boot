@@ -16,7 +16,9 @@ public enum ResultCodeEnum {
     /**
      * 失败
      */
-    FAILURE(500, "失败");
+    FAILURE(500, "失败"),
+
+    BUSINESS_ERROR(501, "失败");
 
     private final Integer code;
 

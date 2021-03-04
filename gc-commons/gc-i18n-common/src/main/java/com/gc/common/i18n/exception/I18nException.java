@@ -1,6 +1,6 @@
 package com.gc.common.i18n.exception;
 
-import com.gc.common.base.exception.BaseException;
+import com.gc.common.base.exception.BusinessException;
 import com.gc.common.base.message.I18nMessage;
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ import lombok.Getter;
  * 2021/1/24 10:39 上午
  */
 @Getter
-public class I18nException extends BaseException {
+public class I18nException extends BusinessException {
     private static final long serialVersionUID = 7336029237493468850L;
 
     private I18nMessage i18nMessage;
@@ -25,11 +25,6 @@ public class I18nException extends BaseException {
     }
 
     public I18nException(I18nMessage i18nMessage) {
-        this.i18nMessage = i18nMessage;
-    }
-
-    public I18nException(Integer code, I18nMessage i18nMessage, Throwable e) {
-        super(code, null, e);
         this.i18nMessage = i18nMessage;
     }
 
