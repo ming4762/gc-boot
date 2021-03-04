@@ -28,9 +28,9 @@ import java.util.Objects;
 @Slf4j
 public class JwtService implements LogoutHandler {
 
-    private static final String TOKE_KEY_PREFIX = "gc:session:user";
+    private static final String TOKE_KEY_PREFIX = "user";
 
-    private static final String DATA_KEY_PREFIX = "gc:session:attribute";
+    private static final String DATA_KEY_PREFIX = "attribute";
 
 
     private final AuthCache<String, Object> authCache;
@@ -68,7 +68,7 @@ public class JwtService implements LogoutHandler {
 
         String jwtKey = this.getTokenKey(user.getUsername(), jwt);
 
-        String attributeKey = this.getAttributeKey(jwt);
+        String attributeKey = this.getAttributeKey(user.getUsername(), jwt);
 
         // 获取有效期
         Long timeout = (Long) this.authCache.get(jwtKey);
@@ -88,11 +88,11 @@ public class JwtService implements LogoutHandler {
      */
     @NonNull
     private String getTokenKey(@NonNull String username, @NonNull String jwt) {
-        return String.format("%s:%s:%s", TOKE_KEY_PREFIX, username, jwt);
+        return String.join(":", this.authProperties.getPrefix(), TOKE_KEY_PREFIX, username, jwt);
     }
 
-    public String getAttributeKey(@NonNull String jwt) {
-        return String.format("%s:%s", DATA_KEY_PREFIX, jwt);
+    public String getAttributeKey(@NonNull String username,  @NonNull String jwt) {
+        return String.join(":", this.authProperties.getPrefix(), DATA_KEY_PREFIX, username, jwt);
     }
 
     /**
@@ -112,7 +112,7 @@ public class JwtService implements LogoutHandler {
             Assert.notNull(user, "系统发生未知异常：未找到当前用户");
             Assert.notNull(jwt, "系统发生未知异常，未找到token");
             this.authCache.remove(this.getTokenKey(user.getUsername(), jwt));
-            this.authCache.remove(this.getAttributeKey(jwt));
+            this.authCache.remove(this.getAttributeKey(user.getUsername(), jwt));
         } else {
             log.debug("用户已登出");
         }

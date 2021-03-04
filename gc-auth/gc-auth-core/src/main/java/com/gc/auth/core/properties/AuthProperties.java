@@ -20,6 +20,8 @@ public class AuthProperties {
 
     private String jwtKey = "gc-it";
 
+    private String prefix = "gc:session";
+
     private boolean jwt = false;
 
     private boolean urlCheck = false;
