@@ -61,4 +61,19 @@ public class ExceptionMessageProcessorBeanConfig {
     public DefaultBusinessExceptionProcessor defaultBusinessExceptionProcessor() {
         return new DefaultBusinessExceptionProcessor();
     }
+
+    @Bean
+    public DefaultBindExceptionProcessor defaultBindExceptionProcessor() {
+        return new DefaultBindExceptionProcessor();
+    }
+
+    @Bean
+    public DefaultMethodArgumentNotValidExceptionProcessor defaultMethodArgumentNotValidExceptionProcessor() {
+        return new DefaultMethodArgumentNotValidExceptionProcessor();
+    }
+
+    @Bean
+    public DefaultConstraintViolationExceptionProcessor defaultConstraintViolationExceptionProcessor() {
+        return new DefaultConstraintViolationExceptionProcessor();
+    }
 }
