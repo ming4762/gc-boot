@@ -1,5 +1,6 @@
 package com.gc.auth.extensions.saml2.service;
 
+import com.gc.auth.core.constants.LoginTypeEnum;
 import com.gc.auth.core.data.GcGrantedAuthority;
 import com.gc.auth.core.data.PermissionGrantedAuthority;
 import com.gc.auth.core.data.RoleGrantedAuthority;
@@ -64,6 +65,7 @@ public class DefaultSamlUserDetailsServiceImpl implements SAMLUserDetailsService
         restUserDetails.setRealName(user.getRealname());
         restUserDetails.setUsername(user.getUsername());
         restUserDetails.setPassword(user.getPassword());
+        restUserDetails.setLoginType(LoginTypeEnum.SAML2);
         return restUserDetails;
     }
 }

@@ -1,5 +1,6 @@
 package com.gc.auth.core.data;
 
+import com.gc.auth.core.constants.LoginTypeEnum;
 import com.gc.auth.core.model.Permission;
 import lombok.NonNull;
 import org.springframework.lang.Nullable;
@@ -57,4 +58,12 @@ public interface RestUserDetails extends UserDetails {
      */
     @Nullable
     String getLocale();
+
+
+    /**
+     * 获取登录类型
+     * @return 登录类型
+     */
+    LoginTypeEnum getLoginType();
+
 }
