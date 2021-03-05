@@ -5,10 +5,10 @@
 	<parent>
 		<groupId>com.gc</groupId>
 		<artifactId>gc-file</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>file-mongo-spring-boot-starter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<name>file-mongo-spring-boot-starter</name>
 	<description>mongo文件存储器</description>
 

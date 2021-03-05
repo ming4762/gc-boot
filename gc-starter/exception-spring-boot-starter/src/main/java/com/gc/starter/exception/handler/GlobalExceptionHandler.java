@@ -1,7 +1,6 @@
 package com.gc.starter.exception.handler;
 
 import com.gc.auth.core.utils.AuthUtils;
-import com.gc.common.base.message.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,18 +27,10 @@ public class GlobalExceptionHandler {
         this.exceptionMessageHandler = exceptionMessageHandler;
     }
 
-    /**
-     * 处理异常
-     * @param e 异常信息
-     * @return 处理后的信息
-     */
-    public static Result<String> doException(Exception e) {
-        return Result.failure(e.getMessage());
-    }
 
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
-    public Object handlerException(Exception e, HttpServletRequest request) {
+    public Object handlerException(Exception e, HttpServletRequest request) throws Exception {
         // 处理异常通知
         this.asyncNoticeHandler.noticeException(e, AuthUtils.getCurrentUser(), request);
         return this.exceptionMessageHandler.message(e, request);

@@ -20,6 +20,8 @@ public class AuthProperties {
 
     private String jwtKey = "gc-it";
 
+    private String prefix = "gc:session";
+
     private boolean jwt = false;
 
     private boolean urlCheck = false;
@@ -126,6 +128,11 @@ public class AuthProperties {
         private KeyStore key = new KeyStore();
 
         private Identity identity = new Identity();
+
+        /**
+         * 重试次数
+         */
+        private Integer retry = 5;
 
         /**
          * key 配置

@@ -2,6 +2,7 @@ package com.gc.common.base.message;
 
 
 import com.gc.common.base.exception.BaseException;
+import com.gc.common.base.exception.BusinessException;
 import com.gc.common.base.http.HttpStatus;
 import com.gc.common.base.http.IHttpStatus;
 import com.github.pagehelper.Page;
@@ -177,8 +178,21 @@ public class Result<T> {
      * @param e
      * @return
      */
-    public static Result<String> failure(@NonNull BaseException e) {
+    public static Result<BaseException> failure(@NonNull BaseException e) {
         return failure(e.getCode(), e.getMessage());
+    }
+
+    public static Result<Exception> failure(@NonNull Exception e) {
+        return failure(ResultCodeEnum.FAILURE.getCode(), e.toString());
+    }
+
+    /**
+     * 业务异常
+     * @param e 异常信息
+     * @return 返回数据
+     */
+    public static Result<String> failure(@NonNull BusinessException e) {
+        return failure(e.getCode(), e.getMessage(), e.toString());
     }
 
     /**
