@@ -27,7 +27,6 @@ public interface ActualFileService {
      * 保存文件
      * @param inputStream 文件流
      * @param filename 文件名
-     * @throws IOException 保存文件发生IO错误
      * @return 文件ID
      */
     @NonNull

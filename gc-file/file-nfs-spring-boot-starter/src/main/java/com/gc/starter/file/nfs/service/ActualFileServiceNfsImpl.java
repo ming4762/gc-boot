@@ -1,7 +1,6 @@
 package com.gc.starter.file.nfs.service;
 
 import com.gc.common.base.exception.BaseException;
-import com.gc.common.base.exception.IORuntimeException;
 import com.gc.common.base.utils.security.Md5Utils;
 import com.gc.common.jcraft.exception.SftpExceptionRuntimeException;
 import com.gc.common.jcraft.utils.JcraftUtils;
@@ -13,6 +12,7 @@ import com.gc.file.common.service.ActualFileService;
 import com.gc.starter.file.nfs.provider.JcraftChannelProvider;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
@@ -56,31 +56,40 @@ public class ActualFileServiceNfsImpl implements ActualFileService {
 
     /**
      * 保存文件
+     * 计算文件MD5会造成非常大的内容压力
      * @param inputStream 文件流
      * @param filename 文件名
      * @return 文件ID
      */
+    @SneakyThrows
     @Override
     @NonNull
     public String save(@NonNull InputStream inputStream, String filename) {
+        InputStream md5InputStream = null;
+        InputStream saveInputStream = null;
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             // 获取channel
             final ChannelSftp channelSftp = this.jcraftChannelProvider.getChannel();
             IOUtils.copy(inputStream, outputStream);
             // 计算md5
-            final String md5 = Md5Utils.md5(new ByteArrayInputStream(outputStream.toByteArray()));
+            md5InputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            final String md5 = Md5Utils.md5(md5InputStream);
             final DiskFilePathBO diskFilePath = new DiskFilePathBO(this.basePath, md5, filename);
             // 创建并进入路径
             JcraftUtils.createDirectories(channelSftp, diskFilePath.getFolderPath());
             // 执行保存
-            channelSftp.put(new ByteArrayInputStream(outputStream.toByteArray()), diskFilePath.getDiskFilename());
+            saveInputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            channelSftp.put(saveInputStream, diskFilePath.getDiskFilename());
             // 归还连接
             this.jcraftChannelProvider.returnChannel(channelSftp);
             return diskFilePath.getFileId();
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
-        } catch (SftpException e) {
-            throw new SftpExceptionRuntimeException(e);
+        } finally {
+            if (md5InputStream != null) {
+                md5InputStream.close();
+            }
+            if (saveInputStream != null) {
+                saveInputStream.close();
+            }
         }
     }
 
@@ -117,23 +126,25 @@ public class ActualFileServiceNfsImpl implements ActualFileService {
      * @param id 文件id
      * @return 文件流
      */
+    @SneakyThrows
     @Override
     public InputStream download(@NonNull String id) {
-        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        // 获取channel
+        final ChannelSftp channelSftp = this.jcraftChannelProvider.getChannel();
+        final DiskFilePathBO diskFile = DiskFilePathBO.createById(id, this.basePath);
+        channelSftp.cd(diskFile.getFolderPath());
+        final ByteArrayInputStream byteArrayInputStream;
+        try (
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                final InputStream inputStream = channelSftp.get(diskFile.getDiskFilename())
+                ) {
             // 获取channel
-            final ChannelSftp channelSftp = this.jcraftChannelProvider.getChannel();
-            final DiskFilePathBO diskFile = DiskFilePathBO.createById(id, this.basePath);
-            channelSftp.cd(diskFile.getFolderPath());
-            IOUtils.copy(channelSftp.get(diskFile.getDiskFilename()), outputStream);
-            final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray());
-            // 归还连接
-            this.jcraftChannelProvider.returnChannel(channelSftp);
-            return byteArrayInputStream;
-        } catch (SftpException e) {
-            throw new SftpExceptionRuntimeException(e);
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
+            IOUtils.copy(inputStream, outputStream);
+            byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray());
         }
+        // 归还连接
+        this.jcraftChannelProvider.returnChannel(channelSftp);
+        return byteArrayInputStream;
     }
 
     /**
@@ -141,23 +152,18 @@ public class ActualFileServiceNfsImpl implements ActualFileService {
      * @param id 文件ID
      * @param outputStream 输出流，文件信息会写入输出流
      */
+    @SneakyThrows
     @Override
     public void download(@NonNull String id, @NonNull OutputStream outputStream) {
-        try {
-            // 获取channel
-            final ChannelSftp channelSftp = this.jcraftChannelProvider.getChannel();
-            final DiskFilePathBO diskFile = DiskFilePathBO.createById(id, this.basePath);
-            channelSftp.cd(diskFile.getFolderPath());
-            try (final InputStream inputStream = channelSftp.get(diskFile.getDiskFilename())) {
-                IOUtils.copy(inputStream, outputStream);
-            }
-            // 归还连接
-            this.jcraftChannelProvider.returnChannel(channelSftp);
-        } catch (SftpException e) {
-            throw new SftpExceptionRuntimeException(e);
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
+        // 获取channel
+        final ChannelSftp channelSftp = this.jcraftChannelProvider.getChannel();
+        final DiskFilePathBO diskFile = DiskFilePathBO.createById(id, this.basePath);
+        channelSftp.cd(diskFile.getFolderPath());
+        try (final InputStream inputStream = channelSftp.get(diskFile.getDiskFilename())) {
+            IOUtils.copy(inputStream, outputStream);
         }
+        // 归还连接
+        this.jcraftChannelProvider.returnChannel(channelSftp);
     }
 
     /**
