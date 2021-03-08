@@ -2,8 +2,12 @@ package com.gc.starter.exception.notice;
 
 
 import com.gc.auth.core.data.RestUserDetails;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 异常通知接口
@@ -18,5 +22,25 @@ public interface ExceptionNotice {
      * @param user 用户信息
      * @param request 请求信息
      */
-    void notice(Exception e, RestUserDetails user, HttpServletRequest request);
+    void notice(@NonNull Exception e, RestUserDetails user, @NonNull HttpServletRequest request);
+
+    /**
+     * 包含的异常进行通知
+     * 如果返回null，则通知所有异常
+     * @return 需要通知的异常
+     */
+    @Nullable
+    default List<Class<? extends Exception>> include() {
+        return null;
+    }
+
+    /**
+     * 不需要通知的异常
+     * @return 不需要通知的异常
+     *
+     */
+    @NonNull
+    default List<Class<? extends Exception>> exclude() {
+        return new ArrayList<>(0);
+    }
 }
