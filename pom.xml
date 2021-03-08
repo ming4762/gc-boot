@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.gc</groupId>
 		<artifactId>gc-boot-dependencies</artifactId>
-		<version>0.0.4-RELEASE</version>
+		<version>0.0.5-RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<artifactId>gc-boot</artifactId>
@@ -25,6 +25,8 @@
 		<java.version>8</java.version>
 		<gc-boot.version>${project.version}</gc-boot.version>
 		<kettle.version>8.3.0.0</kettle.version>
+
+		<spring-boot-admin.version>2.3.1</spring-boot-admin.version>
 	</properties>
 
 	<modules>
@@ -55,7 +57,19 @@
 	</dependencies>
 
 	<dependencyManagement>
+
 		<dependencies>
+			<!--    引入监控服务    -->
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-server</artifactId>
+				<version>${spring-boot-admin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-client</artifactId>
+				<version>${spring-boot-admin.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.github.pagehelper</groupId>
 				<artifactId>pagehelper</artifactId>
