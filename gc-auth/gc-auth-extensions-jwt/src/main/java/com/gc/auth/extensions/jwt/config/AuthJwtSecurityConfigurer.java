@@ -120,7 +120,7 @@ public class AuthJwtSecurityConfigurer extends SecurityConfigurerAdapter<Default
                 .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .accessDeniedHandler(new AuthAccessDeniedHandler())
                 .and()
-                // 添加登录 等处过滤器
+                // 添加登录 登出过滤器
                 .addFilterAfter(this.createJwtFilterChainProxy(), BasicAuthenticationFilter.class)
                 // 添加认证过滤器
                 .addFilterAfter(new JwtAuthenticationFilter(this.jwtService, this.jwtContext), ExceptionTranslationFilter.class);
