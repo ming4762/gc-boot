@@ -2,7 +2,6 @@ package com.gc.auth.core.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gc.auth.core.constants.LoginTypeEnum;
 import com.gc.auth.core.data.GcGrantedAuthority;
 import com.gc.auth.core.data.PermissionGrantedAuthority;
 import com.gc.auth.core.data.RestUserDetails;
@@ -48,7 +47,7 @@ public class RestUserDetailsImpl implements RestUserDetails, Serializable {
      * 标识登录类型
      */
     @Getter
-    private LoginTypeEnum loginType ;
+    private String loginType ;
 
     @Override
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

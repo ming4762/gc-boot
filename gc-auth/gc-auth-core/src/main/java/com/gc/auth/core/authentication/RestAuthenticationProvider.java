@@ -56,7 +56,7 @@ public class RestAuthenticationProvider extends AbstractUserDetailsAuthenticatio
         if (ObjectUtils.isEmpty(user)) {
             throw new InternalAuthenticationServiceException(I18nUtils.get("auth.exception.usernamePasswordError", USERNAME_PASSWORD_ERROR));
         }
-        user.setLoginType(LoginTypeEnum.USERNAME);
+        user.setLoginType(LoginTypeEnum.USERNAME.name());
         return user;
     }
 }

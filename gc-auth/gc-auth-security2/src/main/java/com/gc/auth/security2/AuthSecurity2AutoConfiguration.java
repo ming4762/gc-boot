@@ -3,6 +3,7 @@ package com.gc.auth.security2;
 import com.gc.auth.core.authentication.DefaultUrlAuthenticationProviderImpl;
 import com.gc.auth.core.authentication.MethodPermissionEvaluatorImpl;
 import com.gc.auth.core.authentication.UrlAuthenticationProvider;
+import com.gc.auth.core.beans.UrlMappingProvider;
 import com.gc.auth.core.handler.AuthLoginFailureHandler;
 import com.gc.auth.core.handler.AuthLoginSuccessHandler;
 import com.gc.auth.core.handler.AuthSuccessDataHandler;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * AUTH 自动配置类
@@ -67,14 +67,14 @@ public class AuthSecurity2AutoConfiguration {
 
     /**
      * 创建URL校验器
-     * @param mapping springmvc映射
+     * @param urlMappingProvider urlMappingProvider
      * @return 动态URL校验器
      */
     @Bean
     @ConditionalOnProperty(prefix = "gc.auth", name = "urlCheck", havingValue = "true")
     @ConditionalOnMissingBean(UrlAuthenticationProvider.class)
-    public UrlAuthenticationProvider urlAuthenticationProvider(RequestMappingHandlerMapping mapping) {
-        return new DefaultUrlAuthenticationProviderImpl(mapping);
+    public UrlAuthenticationProvider urlAuthenticationProvider(UrlMappingProvider urlMappingProvider) {
+        return new DefaultUrlAuthenticationProviderImpl(urlMappingProvider);
     }
 
     @Bean
