@@ -4,6 +4,9 @@ import com.gc.common.base.exception.IllegalAccessRuntimeException;
 import com.gc.common.base.exception.InstantiationRuntimeException;
 import com.gc.common.base.exception.InvocationTargetRuntimeException;
 import com.gc.common.base.exception.NoSuchMethodRuntimeException;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,6 +14,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -104,5 +110,41 @@ public class HttpServletUtils {
                     .append(request.getServerPort());
         }
         return url.toString();
+    }
+
+    /**
+     * 读取请求体并转为实体
+     * @param request 请求信息
+     * @param clazz 实体类型
+     * @param <T> 实体类型
+     * @return 实体
+     */
+    public static <T> T getDataFromRequestBody(HttpServletRequest request, Class<T> clazz) {
+        String bodyJson = getBody(request);
+        if (StringUtils.isBlank(bodyJson)) {
+            return null;
+        }
+        return JsonUtils.parse(bodyJson, clazz);
+    }
+
+    /**
+     * 读取请求体并转为字符串
+     * @param request 请求信息
+     * @return 请求体字符串
+     */
+    @SneakyThrows
+    public static String getBody(@NonNull HttpServletRequest request) {
+        final StringBuilder stringBuilder = new StringBuilder();
+        try (
+                final InputStream inputStream = request.getInputStream();
+                final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                ) {
+            char[] charBuffer = new char[128];
+            int bytesRead = -1;
+            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                stringBuilder.append(charBuffer, 0, bytesRead);
+            }
+        }
+        return stringBuilder.toString();
     }
 }

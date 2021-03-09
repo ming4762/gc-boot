@@ -64,6 +64,7 @@ public class I18nUtils {
         return messageSource.getMessage(i18nMessage.getI18nCode(), null, LocaleContextHolder.getLocale());
     }
 
+
     /**
      * 获取I18N信息
      * @param i18nMessage I18nMessage
@@ -71,7 +72,7 @@ public class I18nUtils {
      */
     public static String get(@NonNull I18nMessage i18nMessage, Object ...args) {
         validate();
-        return messageSource.getMessage(i18nMessage.getI18nCode(), args, LocaleContextHolder.getLocale());
+        return get(i18nMessage, args, LocaleContextHolder.getLocale());
     }
 
     /**
@@ -81,7 +82,7 @@ public class I18nUtils {
      */
     public static String get(@NonNull I18nMessage i18nMessage, Object[] args, Locale locale) {
         validate();
-        return messageSource.getMessage(i18nMessage.getI18nCode(), args, locale);
+        return messageSource.getMessage(i18nMessage.getI18nCode(), args, i18nMessage.defaultMessage(), locale);
     }
 
     /**

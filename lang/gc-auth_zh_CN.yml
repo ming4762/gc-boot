@@ -1,1 +1,7 @@
 # 认证模块国际化信息 中文
+
+auth:
+  error:
+    tempToken:
+      empty: 无权限访问：临时token为空
+

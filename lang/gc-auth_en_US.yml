@@ -1,0 +1,9 @@
+# 认证模块国际化信息 中文
+
+auth:
+  error:
+    usernamePasswordError: username or password error
+    usernamePasswordEmpty: username and password can not empty
+    tempToken:
+      empty: Temp Token validate fail，token is null
+

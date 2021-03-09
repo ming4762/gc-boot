@@ -1,8 +1,6 @@
 package com.gc.auth.security2;
 
-import com.gc.auth.core.authentication.DefaultUrlAuthenticationProviderImpl;
 import com.gc.auth.core.authentication.MethodPermissionEvaluatorImpl;
-import com.gc.auth.core.authentication.UrlAuthenticationProvider;
 import com.gc.auth.core.beans.DefaultUrlMappingProvider;
 import com.gc.auth.core.beans.UrlMappingProvider;
 import com.gc.auth.core.handler.AuthLoginFailureHandler;
@@ -67,17 +65,6 @@ public class AuthSecurity2AutoConfiguration {
         return new AuthLoginFailureHandler();
     }
 
-    /**
-     * 创建URL校验器
-     * @param urlMappingProvider urlMappingProvider
-     * @return 动态URL校验器
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "gc.auth", name = "urlCheck", havingValue = "true")
-    @ConditionalOnMissingBean(UrlAuthenticationProvider.class)
-    public UrlAuthenticationProvider urlAuthenticationProvider(UrlMappingProvider urlMappingProvider) {
-        return new DefaultUrlAuthenticationProviderImpl(urlMappingProvider);
-    }
 
     @Bean
     @ConditionalOnMissingBean(AuthSuccessDataHandler.class)
