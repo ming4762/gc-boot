@@ -7,6 +7,7 @@ import org.opensaml.saml2.metadata.provider.AbstractReloadingMetadataProvider;
 import org.springframework.core.io.ClassPathResource;
 
 /**
+ * 重写 metadata Provider，支持从jar中读取
  * @author ShiZhongMing
  * 2021/1/15 14:13
  * @since 1.0

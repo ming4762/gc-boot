@@ -20,4 +20,10 @@ public @interface TempToken {
      * @return true or false
      */
     boolean ipValidate() default true;
+
+    /**
+     * 标识访问的资源
+     * @return 资源
+     */
+    String resource();
 }

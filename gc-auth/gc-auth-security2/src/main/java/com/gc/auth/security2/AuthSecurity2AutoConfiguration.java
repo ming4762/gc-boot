@@ -3,6 +3,7 @@ package com.gc.auth.security2;
 import com.gc.auth.core.authentication.DefaultUrlAuthenticationProviderImpl;
 import com.gc.auth.core.authentication.MethodPermissionEvaluatorImpl;
 import com.gc.auth.core.authentication.UrlAuthenticationProvider;
+import com.gc.auth.core.beans.DefaultUrlMappingProvider;
 import com.gc.auth.core.beans.UrlMappingProvider;
 import com.gc.auth.core.handler.AuthLoginFailureHandler;
 import com.gc.auth.core.handler.AuthLoginSuccessHandler;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * AUTH 自动配置类
@@ -93,5 +95,16 @@ public class AuthSecurity2AutoConfiguration {
     @ConditionalOnMissingBean(PermissionEvaluator.class)
     public PermissionEvaluator permissionEvaluator(AuthProperties authProperties) {
         return new MethodPermissionEvaluatorImpl(authProperties);
+    }
+
+    /**
+     * 创建默认的 UrlMappingProvider
+     * @param mapping RequestMappingHandlerMapping
+     * @return UrlMappingProvider
+     */
+    @Bean
+    @ConditionalOnMissingBean(UrlMappingProvider.class)
+    public DefaultUrlMappingProvider defaultUrlMappingProvider(RequestMappingHandlerMapping mapping) {
+        return new DefaultUrlMappingProvider(mapping);
     }
 }

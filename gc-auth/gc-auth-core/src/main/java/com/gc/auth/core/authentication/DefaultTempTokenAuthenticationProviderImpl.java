@@ -4,6 +4,7 @@ import com.gc.auth.core.annotation.TempToken;
 import com.gc.auth.core.beans.AbstractBeanNameProvider;
 import com.gc.auth.core.beans.UrlMappingProvider;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,11 @@ import java.util.Objects;
  */
 public class DefaultTempTokenAuthenticationProviderImpl extends AbstractBeanNameProvider implements TempTokenAuthenticationProvider {
 
+    /**
+     * 标识token的key
+     */
+    private static final String TEMP_TOKEN_KEY = "access-token";
+
     private final UrlMappingProvider urlMappingProvider;
 
     public DefaultTempTokenAuthenticationProviderImpl(UrlMappingProvider urlMappingProvider) {
@@ -24,9 +30,11 @@ public class DefaultTempTokenAuthenticationProviderImpl extends AbstractBeanName
 
     @Override
     public boolean validate(HttpServletRequest request, Authentication authentication) {
-        if (!this.hasValidate(request)) {
+        final TempToken tempToken = this.hasValidate(request);
+        if (Objects.isNull(tempToken)) {
             return true;
         }
+
         // 进行验证
         return false;
     }
@@ -36,7 +44,9 @@ public class DefaultTempTokenAuthenticationProviderImpl extends AbstractBeanName
      * @param request HttpServletRequest
      * @return 结果
      */
-    protected boolean doValidate(HttpServletRequest request) {
+    protected boolean doValidate(@NonNull HttpServletRequest request, @NonNull TempToken tempToken) {
+        // 获取临时token
+
         return false;
     }
 
@@ -45,16 +55,16 @@ public class DefaultTempTokenAuthenticationProviderImpl extends AbstractBeanName
      * @param request HttpServletRequest
      * @return 结果
      */
-    protected boolean hasValidate(HttpServletRequest request) {
+    protected TempToken hasValidate(HttpServletRequest request) {
         // 获取请求映射
         final UrlMappingProvider.UrlMapping urlMapping = this.urlMappingProvider.matchMapping(request);
         if (Objects.isNull(urlMapping)) {
-            return false;
+            return null;
         }
         TempToken tempToken = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getMethod(), TempToken.class);
         if (Objects.isNull(tempToken)) {
             tempToken = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getBeanType(), TempToken.class);
         }
-        return Objects.isNull(tempToken);
+        return tempToken;
     }
 }
