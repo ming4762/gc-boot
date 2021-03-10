@@ -26,4 +26,5 @@ public @interface TempToken {
      * @return 资源
      */
     String resource();
+
 }

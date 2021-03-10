@@ -30,4 +30,9 @@ public class TempTokenData implements Serializable {
      * 申请的资源
      */
     private String resource;
+
+    /**
+     * 是否只使用一次
+     */
+    private Boolean once = Boolean.TRUE;
 }
