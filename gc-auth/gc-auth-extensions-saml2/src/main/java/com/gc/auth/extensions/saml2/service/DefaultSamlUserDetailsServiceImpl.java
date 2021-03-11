@@ -65,7 +65,7 @@ public class DefaultSamlUserDetailsServiceImpl implements SAMLUserDetailsService
         restUserDetails.setRealName(user.getRealname());
         restUserDetails.setUsername(user.getUsername());
         restUserDetails.setPassword(user.getPassword());
-        restUserDetails.setLoginType(LoginTypeEnum.SAML2);
+        restUserDetails.setLoginType(LoginTypeEnum.SAML2.name());
         return restUserDetails;
     }
 }

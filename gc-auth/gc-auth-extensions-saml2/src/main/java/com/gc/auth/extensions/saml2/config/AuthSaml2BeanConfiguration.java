@@ -107,6 +107,9 @@ public class AuthSaml2BeanConfiguration implements InitializingBean {
         metadataGenerator.setEntityId(this.saml2Properties.getEntityId());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setExtendedMetadata(extendedMetadata);
+        if (StringUtils.isNotBlank(this.saml2Properties.getEntityBaseURL())) {
+            metadataGenerator.setEntityBaseURL(this.saml2Properties.getEntityBaseURL());
+        }
         return metadataGenerator;
     }
 

@@ -76,6 +76,7 @@ public class JwtService implements LogoutHandler {
             this.authCache.expire(jwtKey, timeout);
             this.authCache.expire(attributeKey, timeout);
         } else {
+            // TODO:国际化支持
             throw new InternalAuthenticationServiceException("token已过期，请重新登录");
         }
         return user;
@@ -105,7 +106,7 @@ public class JwtService implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String jwt = JwtUtil.getJwt(request);
         if (StringUtils.isBlank(jwt)) {
-            throw new AuthException("JWT为null，无法登录");
+            throw new AuthException("JWT为null，无法登出");
         }
         final RestUserDetails user = JwtUtil.getUser(jwt, this.authProperties.getJwtKey());
         if (Objects.nonNull(this.authCache.get(this.getTokenKey(user.getUsername(), jwt)))) {

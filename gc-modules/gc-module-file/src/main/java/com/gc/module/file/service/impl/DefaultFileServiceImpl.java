@@ -18,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +44,18 @@ import java.util.stream.Collectors;
  * 2020/1/27 7:50 下午
  */
 @Slf4j
-public class DefaultFileServiceImpl extends BaseServiceImpl<SysFileMapper, SysFilePO> implements SysFileService {
+public class DefaultFileServiceImpl extends BaseServiceImpl<SysFileMapper, SysFilePO> implements SysFileService, ApplicationContextAware, InitializingBean {
 
 
 
-    private final Map<String, ActualFileService> actualFileServiceMap;
+    private Map<String, ActualFileService> actualFileServiceMap;
 
     private final SmartFileProperties fileProperties;
 
-    public DefaultFileServiceImpl(ApplicationContext applicationContext, SmartFileProperties fileProperties) {
-        this.actualFileServiceMap = DefaultFileServiceImpl.initActualFileService(applicationContext);
+    private ApplicationContext applicationContext;
+
+    public DefaultFileServiceImpl(SmartFileProperties fileProperties) {
+
         this.fileProperties = fileProperties;
     }
 
@@ -285,5 +290,15 @@ public class DefaultFileServiceImpl extends BaseServiceImpl<SysFileMapper, SysFi
             throw new IORuntimeException(e);
         }
 
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        this.actualFileServiceMap = DefaultFileServiceImpl.initActualFileService(applicationContext);
+    }
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

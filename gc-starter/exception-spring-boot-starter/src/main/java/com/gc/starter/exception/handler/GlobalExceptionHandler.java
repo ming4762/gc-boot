@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
     public Object handlerException(Exception e, HttpServletRequest request) throws Exception {
         // 处理异常通知
         this.asyncNoticeHandler.noticeException(e, AuthUtils.getCurrentUser(), request);
+        // 返回异常处理信息
         return this.exceptionMessageHandler.message(e, request);
     }
 }

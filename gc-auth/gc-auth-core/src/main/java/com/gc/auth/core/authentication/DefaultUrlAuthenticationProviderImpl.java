@@ -1,49 +1,33 @@
 package com.gc.auth.core.authentication;
 
 import com.gc.auth.core.annotation.NonUrlCheck;
+import com.gc.auth.core.beans.UrlMappingProvider;
 import com.gc.auth.core.constants.RoleConstants;
 import com.gc.auth.core.data.RestUserDetails;
-import com.gc.auth.core.exception.AuthException;
 import com.gc.auth.core.model.Permission;
-import com.gc.common.base.http.HttpStatus;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author ShiZhongMing
  * 2021/1/4 17:03
  * @since 1.0
  */
-public class DefaultUrlAuthenticationProviderImpl extends AbstractUrlAuthenticationProvider implements InitializingBean {
+public class DefaultUrlAuthenticationProviderImpl extends AbstractUrlAuthenticationProvider {
 
-    private final RequestMappingHandlerMapping mapping;
+    private final UrlMappingProvider urlMappingProvider;
 
-    /**
-     * 所有URL映射
-     */
-    private Multimap<String, UrlMapping> allUrlMapping = null;
-
-    public DefaultUrlAuthenticationProviderImpl(RequestMappingHandlerMapping mapping) {
-        this.mapping = mapping;
+    public DefaultUrlAuthenticationProviderImpl(UrlMappingProvider urlMappingProvider) {
+        this.urlMappingProvider = urlMappingProvider;
     }
 
     @Override
@@ -80,89 +64,15 @@ public class DefaultUrlAuthenticationProviderImpl extends AbstractUrlAuthenticat
      * @return true or false
      */
     private boolean hasCheck(HttpServletRequest request) {
-        boolean check = true;
-        boolean match = false;
-        // 获取请求方法
-        String currentMethod = request.getMethod();
-        for (String uri : this.allUrlMapping.keySet()) {
-            AntPathRequestMatcher antPathMatcher = new AntPathRequestMatcher(uri);
-            if (antPathMatcher.matches(request)) {
-                match = true;
-                Collection<UrlMapping> urlMappingList = this.allUrlMapping.get(uri);
-                // 获取对应的请求
-                List<UrlMapping> filterUrlMapping = urlMappingList.stream()
-                        .filter(item -> StringUtils.equals(currentMethod, item.getRequestMethod().name()))
-                        .collect(Collectors.toList());
-                if (filterUrlMapping.isEmpty()) {
-                    throw new AuthException(HttpStatus.METHOD_NOT_ALLOWED);
-                }
-                // 判断方法是否需要校验
-                UrlMapping urlMapping = filterUrlMapping.get(0);
-                NonUrlCheck nonUrlCheck = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getMethod(), NonUrlCheck.class);
-                if (Objects.isNull(nonUrlCheck)) {
-                    nonUrlCheck = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getBeanType(), NonUrlCheck.class);
-                }
-                check = Objects.isNull(nonUrlCheck);
-                break;
-            }
-        }
-        if (!match) {
+        // 获取请求映射
+        final UrlMappingProvider.UrlMapping urlMapping = this.urlMappingProvider.matchMapping(request);
+        if (Objects.isNull(urlMapping)) {
             return false;
         }
-        return check;
-    }
-
-    /**
-     * 获取url映射
-     * @return URL映射
-     */
-    @NonNull
-    private Multimap<String, UrlMapping> getAllUrlMapping() {
-        Multimap<String, UrlMapping> urlMappings = ArrayListMultimap.create();
-
-        // 获取url与类和方法的对应信息
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = mapping.getHandlerMethods();
-
-        handlerMethods.forEach((requestMappingInfo, handlerMethod) -> {
-            // 获取当前 key 下的获取所有URL
-            Set<String> urls = requestMappingInfo.getPatternsCondition()
-                    .getPatterns();
-            RequestMethodsRequestCondition method = requestMappingInfo.getMethodsCondition();
-            urls.forEach(s -> {
-                List<UrlMapping> urlMappingList = method.getMethods().stream()
-                        .map(requestMethod -> {
-                            UrlMapping urlMapping = new UrlMapping();
-                            urlMapping.setRequestMethod(requestMethod);
-                            urlMapping.setHandlerMethod(handlerMethod);
-                            return urlMapping;
-                        }).collect(Collectors.toList());
-                urlMappings.putAll(s, urlMappingList);
-            });
-
-        });
-        return urlMappings;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        this.allUrlMapping = this.getAllUrlMapping();
-    }
-
-    /**
-     * URL映射
-     */
-    @Getter
-    @Setter
-    static
-    class UrlMapping {
-        /**
-         * 请求方法
-         */
-        private RequestMethod requestMethod;
-
-        /**
-         * 执行目标方法
-         */
-        private HandlerMethod handlerMethod;
+        NonUrlCheck nonUrlCheck = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getMethod(), NonUrlCheck.class);
+        if (Objects.isNull(nonUrlCheck)) {
+            nonUrlCheck = AnnotationUtils.findAnnotation(urlMapping.getHandlerMethod().getBeanType(), NonUrlCheck.class);
+        }
+        return Objects.isNull(nonUrlCheck);
     }
 }

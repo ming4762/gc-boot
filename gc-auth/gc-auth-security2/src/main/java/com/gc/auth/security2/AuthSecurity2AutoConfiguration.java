@@ -1,8 +1,8 @@
 package com.gc.auth.security2;
 
-import com.gc.auth.core.authentication.DefaultUrlAuthenticationProviderImpl;
 import com.gc.auth.core.authentication.MethodPermissionEvaluatorImpl;
-import com.gc.auth.core.authentication.UrlAuthenticationProvider;
+import com.gc.auth.core.beans.DefaultUrlMappingProvider;
+import com.gc.auth.core.beans.UrlMappingProvider;
 import com.gc.auth.core.handler.AuthLoginFailureHandler;
 import com.gc.auth.core.handler.AuthLoginSuccessHandler;
 import com.gc.auth.core.handler.AuthSuccessDataHandler;
@@ -65,17 +65,6 @@ public class AuthSecurity2AutoConfiguration {
         return new AuthLoginFailureHandler();
     }
 
-    /**
-     * 创建URL校验器
-     * @param mapping springmvc映射
-     * @return 动态URL校验器
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "gc.auth", name = "urlCheck", havingValue = "true")
-    @ConditionalOnMissingBean(UrlAuthenticationProvider.class)
-    public UrlAuthenticationProvider urlAuthenticationProvider(RequestMappingHandlerMapping mapping) {
-        return new DefaultUrlAuthenticationProviderImpl(mapping);
-    }
 
     @Bean
     @ConditionalOnMissingBean(AuthSuccessDataHandler.class)
@@ -93,5 +82,16 @@ public class AuthSecurity2AutoConfiguration {
     @ConditionalOnMissingBean(PermissionEvaluator.class)
     public PermissionEvaluator permissionEvaluator(AuthProperties authProperties) {
         return new MethodPermissionEvaluatorImpl(authProperties);
+    }
+
+    /**
+     * 创建默认的 UrlMappingProvider
+     * @param mapping RequestMappingHandlerMapping
+     * @return UrlMappingProvider
+     */
+    @Bean
+    @ConditionalOnMissingBean(UrlMappingProvider.class)
+    public DefaultUrlMappingProvider defaultUrlMappingProvider(RequestMappingHandlerMapping mapping) {
+        return new DefaultUrlMappingProvider(mapping);
     }
 }

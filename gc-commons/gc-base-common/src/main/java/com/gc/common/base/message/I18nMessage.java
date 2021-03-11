@@ -12,4 +12,12 @@ public interface I18nMessage {
      * @return key
      */
     String getI18nCode();
+
+    /**
+     * 获取默认的信息
+     * @return 默认
+     */
+    default String defaultMessage() {
+        return null;
+    }
 }
