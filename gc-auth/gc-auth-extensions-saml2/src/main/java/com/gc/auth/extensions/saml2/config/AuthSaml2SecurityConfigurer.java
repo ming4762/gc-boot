@@ -53,7 +53,7 @@ public class AuthSaml2SecurityConfigurer extends SecurityConfigurerAdapter<Defau
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers(this.getUrl(SamlUrlConstants.COMMON)).permitAll()
+//                .antMatchers(this.getUrl(SamlUrlConstants.COMMON)).permitAll()
                 .and()
                 .authenticationProvider(this.getBean(SAMLAuthenticationProvider.class));
         // 添加Filter
