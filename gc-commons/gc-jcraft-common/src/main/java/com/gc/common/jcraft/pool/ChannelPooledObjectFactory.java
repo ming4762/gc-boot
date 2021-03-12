@@ -40,8 +40,8 @@ public class ChannelPooledObjectFactory<T extends Channel> implements PooledObje
     public void destroyObject(PooledObject<T> pooledObject) throws Exception {
         T object = pooledObject.getObject();
         if (Objects.nonNull(object)) {
-            object.getSession().disconnect();
             object.disconnect();
+            object.getSession().disconnect();
         }
     }
 
