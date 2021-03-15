@@ -1,5 +1,6 @@
 package com.gc.auth.extensions.jwt.handler;
 
+import com.gc.auth.core.constants.LoginTypeConstants;
 import com.gc.auth.core.data.RestUserDetails;
 import com.gc.auth.core.handler.DefaultAuthSuccessDataHandler;
 import com.gc.auth.core.model.LoginResult;
@@ -21,11 +22,11 @@ public class JwtAuthSuccessDataHandler extends DefaultAuthSuccessDataHandler imp
     private JwtService jwtService;
 
     @Override
-    public LoginResult successData(Authentication authentication, HttpServletRequest request) {
+    public LoginResult successData(Authentication authentication, HttpServletRequest request, LoginTypeConstants loginType) {
         String jwt = this.jwtService.createJwt((RestUserDetails)authentication.getPrincipal(), null);
         // 设置token
         ((RestUserDetails)authentication.getPrincipal()).setToken(jwt);
-        return super.successData(authentication, request);
+        return super.successData(authentication, request, loginType);
     }
 
     @Autowired

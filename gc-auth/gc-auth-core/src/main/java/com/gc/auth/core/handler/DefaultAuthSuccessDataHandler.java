@@ -1,5 +1,6 @@
 package com.gc.auth.core.handler;
 
+import com.gc.auth.core.constants.LoginTypeConstants;
 import com.gc.auth.core.data.RestUserDetails;
 import com.gc.auth.core.model.LoginResult;
 import com.gc.auth.core.model.Permission;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultAuthSuccessDataHandler implements AuthSuccessDataHandler {
     @Override
-    public LoginResult successData(Authentication authentication, HttpServletRequest request) {
+    public LoginResult successData(Authentication authentication, HttpServletRequest request, LoginTypeConstants loginType) {
         final RestUserDetails userDetails = (RestUserDetails) authentication.getPrincipal();
         // 处理用户权限信息
         return LoginResult.builder()

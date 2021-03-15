@@ -32,22 +32,22 @@ public class AuthLoginSuccessHandler implements AuthenticationSuccessHandler, In
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-        this.setSessionMaxInactiveInterval(httpServletRequest);
-        RestJsonWriter.writeJson(httpServletResponse, Result.success(this.authSuccessDataHandler.successData(authentication, httpServletRequest)));
+        final LoginParameter loginParameter = LoginParameter.create(httpServletRequest);
+        this.setSessionMaxInactiveInterval(httpServletRequest, loginParameter.getLoginType());
+        RestJsonWriter.writeJson(httpServletResponse, Result.success(this.authSuccessDataHandler.successData(authentication, httpServletRequest, loginParameter.getLoginType())));
     }
 
     /**
      * 设置session过期时间
      * @param request 请求信息
      */
-    protected void setSessionMaxInactiveInterval(HttpServletRequest request) {
-        final LoginParameter loginParameter = LoginParameter.create(request);
+    protected void setSessionMaxInactiveInterval(HttpServletRequest request, LoginTypeConstants loginType) {
 
         // 获取有效期
         Long timeout = authProperties.getSession().getTimeout().getGlobal();
-        if (Objects.equals(loginParameter.getLoginType(), LoginTypeConstants.MOBILE)) {
+        if (Objects.equals(loginType, LoginTypeConstants.MOBILE)) {
             timeout = authProperties.getSession().getTimeout().getMobile();
-        } else if (Objects.equals(loginParameter.getLoginType(), LoginTypeConstants.REMEMBER)) {
+        } else if (Objects.equals(loginType, LoginTypeConstants.REMEMBER)) {
             timeout = authProperties.getSession().getTimeout().getRemember();
         }
         request.getSession().setMaxInactiveInterval(timeout.intValue());

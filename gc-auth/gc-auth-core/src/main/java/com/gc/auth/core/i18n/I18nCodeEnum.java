@@ -11,7 +11,13 @@ public enum I18nCodeEnum implements I18nMessage {
     /**
      * temp token为null
      */
-    ERROR_EMPTY_TEMP_TOKEN("auth.error.tempToken.empty", "Temp Token validate fail，token is null"),
+    ERROR_TEMP_TOKEN_EMPTY("auth.error.tempToken.empty", "Temp Token validate fail，token is empty"),
+    // 临时token过期
+    ERROR_TEMP_TOKEN_EXPIRE("auth.error.tempToken.expire", "Temp Token validate fail，token is expire"),
+    // temp token ip验证错误
+    ERROR_TEMP_TOKEN_IP_FAIL("auth.error.tempToken.ipFail", "Temp Token validate fail： IP validate fail"),
+    // 资源验证失败
+    ERROR_TEMP_TOKEN_RESOURCE_FAIL("auth.error.tempToken.resourceFail", "Temp Token validate fail: resource validate fail"),
     // 用户名密码错误
     USERNAME_PASSWORD_ERROR("auth.error.usernamePasswordError", "username or password error"),
     // 用户名密码不能为null
