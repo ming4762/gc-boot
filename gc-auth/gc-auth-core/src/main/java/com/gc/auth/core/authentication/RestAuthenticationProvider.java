@@ -1,6 +1,7 @@
 package com.gc.auth.core.authentication;
 
 import com.gc.auth.core.constants.LoginTypeEnum;
+import com.gc.auth.core.exception.AuthException;
 import com.gc.auth.core.i18n.I18nCodeEnum;
 import com.gc.auth.core.model.RestUserDetailsImpl;
 import com.gc.common.i18n.utils.I18nUtils;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * 登录管理
@@ -33,7 +35,7 @@ public class RestAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) {
 
         if (ObjectUtils.isEmpty(authentication.getCredentials())) {
-            logger.debug("登录失败:密码不存在");
+            logger.debug("登录失败:用户不存在");
             throw new InternalAuthenticationServiceException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_NULL));
         }
         final String password = authentication.getCredentials().toString();
@@ -47,11 +49,11 @@ public class RestAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
         String password = (String) authentication.getCredentials();
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.equals(NONE_PROVIDED, username)) {
-            throw new InternalAuthenticationServiceException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_NULL));
+            throw new AuthException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_NULL));
         }
         RestUserDetailsImpl user = (RestUserDetailsImpl) this.restUserDetailsService.loadUserByUsername(username);
         if (ObjectUtils.isEmpty(user)) {
-            throw new InternalAuthenticationServiceException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_ERROR));
+            throw new UsernameNotFoundException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_ERROR));
         }
         user.setLoginType(LoginTypeEnum.USERNAME.name());
         return user;
