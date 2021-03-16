@@ -1,7 +1,12 @@
 # 认证模块国际化信息 中文
-
 auth:
   error:
+    usernamePasswordError: 用户名密码错误
+    usernamePasswordEmpty: 用户名密码不能为空
     tempToken:
-      empty: 无权限访问：临时token为空
+      empty: 临时token验证失败，token为空
+      expire: 临时token验证失败，token已过期
+      ipFail: 临时token验证失败： IP验证失败, 注册IP：[{0}], 请求IP： [{1}]
+      resourceFail: '临时token验证失败: 资源验证失败, 注册资源:[{0}], 请求资源: [{1}]'
+
 
