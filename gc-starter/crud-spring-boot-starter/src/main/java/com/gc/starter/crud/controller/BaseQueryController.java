@@ -10,8 +10,8 @@ import com.gc.starter.crud.query.PageQuery;
 import com.gc.starter.crud.query.PageQueryParameter;
 import com.gc.starter.crud.service.BaseService;
 import com.gc.starter.crud.utils.CrudUtils;
+import com.gc.starter.crud.utils.PageCache;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -48,6 +48,7 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
      */
     public Result<Object> list(@RequestBody PageQueryParameter<String, Object> parameter) {
         final Page<T> page = this.doPage(parameter);
+        PageCache.set(page);
         final QueryWrapper<T> queryWrapper = CrudUtils.createQueryWrapperFromParameters(parameter, this.getModelType());
         final Object keyword = parameter.get(CrudConstants.KEYWORD.name());
         if (keyword instanceof String) {
@@ -113,17 +114,17 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
         if (Objects.nonNull(limit)) {
             // 解析排序字段
             final String orderMessage = this.analysisOrder(sortName, sortOrder);
-            if (!StringUtils.isEmpty(orderMessage)) {
-                PageHelper.orderBy(orderMessage);
-            }
             // 进行分页
             if (Objects.nonNull(pageNum)) {
-                page = PageHelper.startPage(pageNum, limit);
+                page = new Page<>(pageNum, limit, true);
             } else {
                 if (ObjectUtils.isEmpty(offset)) {
                     offset = 0;
                 }
-                page = PageHelper.offsetPage(offset, limit);
+                page = new Page<>(new int[]{offset, limit}, true);
+            }
+            if (!StringUtils.isEmpty(orderMessage)) {
+                page.setOrderBy(orderMessage);
             }
         }
         return page;

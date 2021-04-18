@@ -19,8 +19,11 @@ import com.gc.starter.crud.model.BaseModel;
 import com.gc.starter.crud.model.Sort;
 import com.gc.starter.crud.query.PageQueryParameter;
 import com.gc.starter.crud.service.BaseService;
+import com.gc.starter.crud.utils.CrudPageHelper;
 import com.gc.starter.crud.utils.CrudUtils;
 import com.gc.starter.crud.utils.IdGenerator;
+import com.gc.starter.crud.utils.PageCache;
+import com.github.pagehelper.Page;
 import com.google.common.collect.Lists;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -255,6 +258,10 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
     @Override
     public @NonNull List<T> list(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageQueryParameter<String, Object> parameter, @NonNull Boolean paging) {
         this.analysisOrder(queryWrapper, parameter, paging);
+        final Page<?> page = PageCache.get();
+        if (page != null) {
+            CrudPageHelper.setPage(page);
+        }
         return super.list(queryWrapper);
     }
 
