@@ -8,6 +8,7 @@ import com.gc.auth.core.model.AuthUser;
 import com.gc.auth.core.model.RestUserDetailsImpl;
 import com.gc.auth.core.service.AuthUserService;
 import com.google.common.collect.Sets;
+import lombok.SneakyThrows;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.saml.SAMLCredential;
@@ -30,6 +31,7 @@ public class DefaultSamlUserDetailsServiceImpl implements SAMLUserDetailsService
         this.userService = authUserService;
     }
 
+    @SneakyThrows
     @Override
     public Object loadUserBySAML(SAMLCredential credential) {
         // 获取用户名

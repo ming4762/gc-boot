@@ -203,7 +203,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
     @NonNull
     public List<ColumnBO> listColumn(@NonNull DbConnectionConfig connectionConfig, @NonNull String tableName) {
 
-        log.debug("读取表【{}】列信息", tableName);
+        log.info("读取表【{}】列信息", tableName);
 
         final String join = "#";
         final List<ColumnDO> baseColumnList = this.listBaseColumn(connectionConfig, tableName);

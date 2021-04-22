@@ -35,6 +35,8 @@ public class SamlRetryAuthLoginFailureHandler extends AuthLoginFailureHandler {
             final String key = IpUtils.getIpAddr(request);
             int timer = SamlRetryTimerHolder.get(key);
             if (timer > this.authProperties.getSaml2().getRetry()) {
+                // 重置次数
+                SamlRetryTimerHolder.reset(key);
                 super.onAuthenticationFailure(request, response, exception);
             } else {
                 SamlRetryTimerHolder.add(key);

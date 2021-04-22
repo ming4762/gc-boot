@@ -4,6 +4,8 @@ import com.gc.database.message.annotation.DatabaseField;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * 字段DO
  * @author ShiZhongMing
@@ -92,4 +94,47 @@ public class ColumnDO extends AbstractTableBaseDO {
 
     @DatabaseField("SS_DATA_TYPE")
     private Boolean ssDataType;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ColumnDO columnDO = (ColumnDO) o;
+        return Objects.equals(columnName, columnDO.columnName)
+                && Objects.equals(dataType, columnDO.dataType)
+                && Objects.equals(typeName, columnDO.typeName)
+                && Objects.equals(columnSize, columnDO.columnSize)
+                && Objects.equals(bufferLength, columnDO.bufferLength)
+                && Objects.equals(decimalDigits, columnDO.decimalDigits)
+                && Objects.equals(numPrecRadix, columnDO.numPrecRadix)
+                && Objects.equals(nullable, columnDO.nullable)
+                && Objects.equals(remarks, columnDO.remarks)
+                && Objects.equals(columnDef, columnDO.columnDef)
+                && Objects.equals(sqlDataType, columnDO.sqlDataType)
+                && Objects.equals(sqlDatetimeSub, columnDO.sqlDatetimeSub)
+                && Objects.equals(charOctetLength, columnDO.charOctetLength)
+                && Objects.equals(ordinalPosition, columnDO.ordinalPosition)
+                && Objects.equals(isNullable, columnDO.isNullable)
+                && Objects.equals(ssIsSparse, columnDO.ssIsSparse)
+                && Objects.equals(ssIsColumnSet, columnDO.ssIsColumnSet)
+                && Objects.equals(ssIsComputed, columnDO.ssIsComputed)
+                && Objects.equals(autoincrement, columnDO.autoincrement)
+                && Objects.equals(ssUdtCatalogName, columnDO.ssUdtCatalogName)
+                && Objects.equals(ssUdtSchemaName, columnDO.ssUdtSchemaName)
+                && Objects.equals(ssUdtAssemblyTypeName, columnDO.ssUdtAssemblyTypeName)
+                && Objects.equals(ssXmlSchemacollectionCatalogName, columnDO.ssXmlSchemacollectionCatalogName)
+                && Objects.equals(ssXmlSchemacollectionSchemaName, columnDO.ssXmlSchemacollectionSchemaName)
+                && Objects.equals(ssXmlSchemacollectionName, columnDO.ssXmlSchemacollectionName)
+                && Objects.equals(ssDataType, columnDO.ssDataType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(columnName, dataType, typeName, columnSize, bufferLength, decimalDigits, numPrecRadix, nullable, remarks, columnDef, sqlDataType, sqlDatetimeSub, charOctetLength, ordinalPosition, isNullable, ssIsSparse, ssIsColumnSet, ssIsComputed, autoincrement, ssUdtCatalogName, ssUdtSchemaName, ssUdtAssemblyTypeName, ssXmlSchemacollectionCatalogName, ssXmlSchemacollectionSchemaName, ssXmlSchemacollectionName, ssDataType);
+    }
 }

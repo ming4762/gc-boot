@@ -46,16 +46,19 @@ public class DatabaseMessageAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public MysqlDatabaseExecutor mysqlDatabaseExecutor(DbJavaTypeConverter dbJavaTypeConverter) {
         return new MysqlDatabaseExecutor(dbJavaTypeConverter);
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public OracleDatabaseExecutor oracleDatabaseExecutor(DbJavaTypeConverter dbJavaTypeConverter) {
         return new OracleDatabaseExecutor(dbJavaTypeConverter);
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SqlServerDatabaseExecutor sqlServerDatabaseExecutor(DbJavaTypeConverter dbJavaTypeConverter) {
         return new SqlServerDatabaseExecutor(dbJavaTypeConverter);
     }
