@@ -1,8 +1,6 @@
 package com.gc.auth.extensions.jwt.config;
 
-import com.gc.auth.core.handler.AuthAccessDeniedHandler;
 import com.gc.auth.core.handler.AuthHandlerBuilder;
-import com.gc.auth.core.handler.RestAuthenticationEntryPoint;
 import com.gc.auth.core.properties.AuthProperties;
 import com.gc.auth.core.service.AuthCache;
 import com.gc.auth.extensions.jwt.context.JwtContext;
@@ -114,11 +112,6 @@ public class AuthJwtSecurityConfigurer extends SecurityConfigurerAdapter<Default
                 .logout().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                // 设置异常信息拦截
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .accessDeniedHandler(new AuthAccessDeniedHandler())
                 .and()
                 // 添加登录 登出过滤器
                 .addFilterAfter(this.createJwtFilterChainProxy(), BasicAuthenticationFilter.class)

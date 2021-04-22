@@ -1,13 +1,13 @@
 package com.gc.auth.core.authentication;
 
 import com.gc.auth.core.constants.LoginTypeEnum;
-import com.gc.auth.core.exception.AuthException;
 import com.gc.auth.core.i18n.I18nCodeEnum;
 import com.gc.auth.core.model.RestUserDetailsImpl;
 import com.gc.common.i18n.utils.I18nUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -49,7 +49,7 @@ public class RestAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
         String password = (String) authentication.getCredentials();
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.equals(NONE_PROVIDED, username)) {
-            throw new AuthException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_NULL));
+            throw new BadCredentialsException(I18nUtils.get(I18nCodeEnum.USERNAME_PASSWORD_NULL));
         }
         RestUserDetailsImpl user = (RestUserDetailsImpl) this.restUserDetailsService.loadUserByUsername(username);
         if (ObjectUtils.isEmpty(user)) {

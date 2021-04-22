@@ -42,7 +42,6 @@
 		<module>gc-file</module>
 		<module>gc-modules</module>
 		<module>gc-monitor</module>
-		<module>gc-samples</module>
 		<module>gc-sap</module>
 		<module>gc-starter</module>
 	</modules>

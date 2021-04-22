@@ -60,7 +60,12 @@ public class I18nUtils {
      * @return I18N
      */
     public static String get(@NonNull I18nMessage i18nMessage) {
-        validate();
+        if (messageSource == null) {
+            if (i18nMessage.defaultMessage() != null) {
+                return i18nMessage.defaultMessage();
+            }
+            throw new IllegalArgumentException("messageSource cannot be null");
+        }
         return messageSource.getMessage(i18nMessage.getI18nCode(), null, LocaleContextHolder.getLocale());
     }
 
