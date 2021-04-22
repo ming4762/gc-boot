@@ -23,13 +23,11 @@ public class SysUserGroupUserPO extends BaseModelCreateUserTime {
     /**
      * 用户ID
      */
-    @TableId
     private Long userId;
 
     /**
      * 用户组ID
      */
-    @TableId
     private Long userGroupId;
 
     /**

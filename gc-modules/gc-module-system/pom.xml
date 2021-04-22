@@ -37,11 +37,6 @@
 			<version>${gc-boot.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-		</dependency>
-
 		<!--引入web支持-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

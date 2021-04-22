@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.gc</groupId>
-		<artifactId>gc-boot-dependencies</artifactId>
-		<version>0.0.5-RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+	<groupId>com.gc</groupId>
 	<artifactId>gc-boot</artifactId>
 	<version>1.0.6-SNAPSHOT</version>
 	<name>gc-boot</name>
 	<description>gc 通用开发框架</description>
-	<developers>
-		<developer>
-			<id>shizhongming</id>
-			<name>shizhongming</name>
-			<email>zhongming4762@hotmail.com</email>
-		</developer>
-	</developers>
+
 	<packaging>pom</packaging>
 
 	<properties>
 		<java.version>8</java.version>
-		<gc-boot.version>${project.version}</gc-boot.version>
-		<kettle.version>8.3.0.0</kettle.version>
+		<resource.delimiter>@</resource.delimiter>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+		<spring-boot.version>2.4.5</spring-boot.version>
+		<gc-boot.version>${project.version}</gc-boot.version>
+
+		<kettle.version>8.3.0.0</kettle.version>
 		<spring-boot-admin.version>2.3.1</spring-boot-admin.version>
+		<guava.version>28.1-jre</guava.version>
+		<jjwt.version>0.9.1</jjwt.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
+		<commons-io.version>2.6</commons-io.version>
+		<pagehelper.version>1.2.13</pagehelper.version>
+		<mybatis-plus-boot-starter.version>3.4.2</mybatis-plus-boot-starter.version>
+		<!--druid数据源版本-->
+		<druid.version>1.2.5</druid.version>
+		<swagger2.version>2.9.2</swagger2.version>
 	</properties>
 
 	<modules>
@@ -36,20 +42,24 @@
 		<module>gc-file</module>
 		<module>gc-modules</module>
 		<module>gc-monitor</module>
+		<module>gc-samples</module>
 		<module>gc-sap</module>
 		<module>gc-starter</module>
 	</modules>
 
+	<developers>
+		<developer>
+			<id>shizhongming</id>
+			<name>shizhongming</name>
+			<email>zhongming4762@hotmail.com</email>
+		</developer>
+	</developers>
+	<organization>
+		<name>GC IT</name>
+		<url>http://www.gc-it.cn/</url>
+	</organization>
+
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -59,6 +69,55 @@
 	<dependencyManagement>
 
 		<dependencies>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${swagger2.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>guava</artifactId>
+						<groupId>com.google.guava</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${swagger2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${commons-beanutils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt</artifactId>
+				<version>${jjwt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.pagehelper</groupId>
+				<artifactId>pagehelper-spring-boot-starter</artifactId>
+				<version>${pagehelper.version}</version>
+			</dependency>
+			<!--	  springboot		-->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<!--    引入监控服务    -->
 			<dependency>
 				<groupId>de.codecentric</groupId>
@@ -84,6 +143,12 @@
 				<groupId>org.springframework.security.extensions</groupId>
 				<artifactId>spring-security-saml2-core</artifactId>
 				<version>1.0.10.RELEASE</version>
+			</dependency>
+			<!--mybatis-plus支持-->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus-boot-starter.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.opensaml</groupId>

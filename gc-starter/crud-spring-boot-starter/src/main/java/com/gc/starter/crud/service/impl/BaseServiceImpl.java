@@ -155,12 +155,11 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      */
     @Override
     public boolean save(@NonNull T entity) {
-        Class<?> cls = entity.getClass();
         // 获取key
         final TableInfo tableInfo = this.getTableInfo();
         String keyProperty = tableInfo.getKeyProperty();
         Assert.notEmpty(keyProperty, KEY_PROPERTY_NULL_ERROR);
-        Object idVal = ReflectionKit.getMethodValue(cls, entity, tableInfo.getKeyProperty());
+        Object idVal = ReflectionKit.getFieldValue(entity, tableInfo.getKeyProperty());
         if (StringUtils.checkValNull(idVal)) {
             // 如果ID为null 手动设置ID
             this.setNumberId(entity, tableInfo);
@@ -181,12 +180,11 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
         }
         // 获取实体类tableInfo
         final TableInfo tableInfo = this.getTableInfo();
-        Class<? extends BaseModel> clazz = this.currentModelClass();
         String keyProperty = tableInfo.getKeyProperty();
         Assert.notEmpty(keyProperty, KEY_PROPERTY_NULL_ERROR);
         // 遍历实体类设置主键
         entityList.forEach(entity -> {
-            Object idVal = ReflectionKit.getMethodValue(clazz, entity, keyProperty);
+            Object idVal = ReflectionKit.getFieldValue(entity, tableInfo.getKeyProperty());
             if (StringUtils.checkValNull(idVal)) {
                 // 如果ID为null 手动设置ID
                 this.setNumberId(entity, tableInfo);
@@ -502,6 +500,6 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
         Assert.notNull(tableInfo, "error: can not execute. because can not find cache of TableInfo for entity!");
         String keyProperty = tableInfo.getKeyProperty();
         Assert.notEmpty(keyProperty, KEY_PROPERTY_NULL_ERROR);
-        return (Serializable) ReflectionKit.getMethodValue(cls, entity, tableInfo.getKeyProperty());
+        return (Serializable) ReflectionKit.getFieldValue(entity, tableInfo.getKeyProperty());
     }
 }

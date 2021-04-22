@@ -21,13 +21,11 @@ public class SysUserRolePO extends BaseModelCreateUserTime {
     /**
      * 用户ID
      */
-    @TableId
     private Long userId;
 
     /**
      * 角色ID
      */
-    @TableId
     private Long roleId;
 
     /**

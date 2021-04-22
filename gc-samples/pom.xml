@@ -11,8 +11,15 @@
     <version>1.0.6-SNAPSHOT</version>
     <name>gc-samples</name>
     <description>示例模块</description>
+    <packaging>pom</packaging>
+
     <properties>
     </properties>
+
+    <modules>
+        <module>gc-sample-system</module>
+    </modules>
+
     <dependencies>
 
     </dependencies>

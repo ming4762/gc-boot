@@ -16,9 +16,7 @@ import lombok.Setter;
 public class SysRoleFunctionPO extends BaseModelCreateUserTime {
     private static final long serialVersionUID = -8303994182948294185L;
 
-    @TableId
     private Long roleId;
 
-    @TableId
     private Long functionId;
 }

@@ -60,15 +60,15 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUserPO
 
     private final SysRoleFunctionService sysRoleFunctionService;
 
-    @Autowired
-    private SysFunctionService sysFunctionService;
+    private final SysFunctionService sysFunctionService;
 
-    public SysUserServiceImpl(SysUserRoleService sysUserRoleService, SysUserGroupUserMapper sysUserGroupUserMapper, SysUserGroupRoleMapper sysUserGroupRoleMapper, SysRoleService sysRoleService, SysRoleFunctionService sysRoleFunctionService) {
+    public SysUserServiceImpl(SysUserRoleService sysUserRoleService, SysUserGroupUserMapper sysUserGroupUserMapper, SysUserGroupRoleMapper sysUserGroupRoleMapper, SysRoleService sysRoleService, SysRoleFunctionService sysRoleFunctionService, SysFunctionService sysFunctionService) {
         this.sysUserRoleService = sysUserRoleService;
         this.sysUserGroupUserMapper = sysUserGroupUserMapper;
         this.sysUserGroupRoleMapper = sysUserGroupRoleMapper;
         this.sysRoleService = sysRoleService;
         this.sysRoleFunctionService = sysRoleFunctionService;
+        this.sysFunctionService = sysFunctionService;
     }
 
     /**
@@ -153,7 +153,6 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUserPO
      * 设置人员信息
      * @param resource 原
      * @param <T> 目标类型
-     * @return list目标类型
      */
     @Override
     public <T> void setWithUser(@NonNull List<T> resource) {

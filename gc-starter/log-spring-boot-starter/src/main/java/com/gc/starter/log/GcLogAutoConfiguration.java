@@ -1,6 +1,9 @@
 package com.gc.starter.log;
 
 import com.gc.starter.log.aspect.LogAspect;
+import com.gc.starter.log.handler.DefaultLogHandler;
+import com.gc.starter.log.handler.LogHandler;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,5 +24,11 @@ public class GcLogAutoConfiguration {
     @Bean
     public LogAspect logAspect() {
         return new LogAspect();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LogHandler defaultLogHandler() {
+        return new DefaultLogHandler();
     }
 }

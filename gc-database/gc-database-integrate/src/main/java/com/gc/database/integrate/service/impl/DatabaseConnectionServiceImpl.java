@@ -20,7 +20,7 @@ import java.util.List;
 public class DatabaseConnectionServiceImpl extends BaseServiceImpl<DatabaseConnectionMapper, DatabaseConnectionDO> implements DatabaseConnectionService {
 
     @Override
-    public boolean save(DatabaseConnectionDO entity) {
+    public boolean save(@NonNull DatabaseConnectionDO entity) {
         entity.setCreateTime(LocalDateTime.now());
         return super.save(entity);
     }
