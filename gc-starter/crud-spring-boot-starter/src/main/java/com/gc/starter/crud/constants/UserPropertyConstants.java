@@ -24,7 +24,7 @@ public enum UserPropertyConstants {
 
 
     @Getter
-    private String name;
+    private final String name;
 
     UserPropertyConstants(String name) {
         this.name = name;
