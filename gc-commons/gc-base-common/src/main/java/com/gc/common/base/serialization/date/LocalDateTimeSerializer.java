@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 /**
@@ -16,6 +17,6 @@ import java.time.ZoneOffset;
 public class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeNumber(value.toInstant(ZoneOffset.of("+8")).toEpochMilli());
+        gen.writeNumber(value.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli());
     }
 }

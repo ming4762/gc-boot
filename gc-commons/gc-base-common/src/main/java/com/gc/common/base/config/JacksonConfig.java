@@ -1,10 +1,9 @@
 package com.gc.common.base.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gc.common.base.serialization.date.LocalDateTimeDeserializer;
 import com.gc.common.base.serialization.date.LocalDateTimeSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,14 +21,12 @@ public class JacksonConfig {
     private Boolean datesAsTimestamps;
 
     @Bean
-    public ObjectMapper objectMapper() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        if (Objects.equals(Boolean.TRUE, datesAsTimestamps)) {
-            final JavaTimeModule javaTimeModule = new JavaTimeModule();
-            javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
-            javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
-            objectMapper.registerModule(javaTimeModule);
-        }
-        return objectMapper;
+    public Jackson2ObjectMapperBuilderCustomizer localDateTimeCustomizer() {
+        return builder -> {
+            if (Objects.equals(Boolean.TRUE, datesAsTimestamps)) {
+                builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer());
+                builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer());
+            }
+        };
     }
 }

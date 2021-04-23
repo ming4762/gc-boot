@@ -1,9 +1,13 @@
 package com.gc.common.base.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gc.common.base.exception.BaseException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * json 工具类
@@ -58,5 +62,18 @@ public final class JsonUtils {
         } catch (JsonProcessingException e) {
             throw new BaseException(JSONERROR, e);
         }
+    }
+
+    /**
+     * 转换list
+     * @param json json
+     * @param clazz 实体类类型
+     * @param <T>
+     * @return
+     */
+    @SneakyThrows
+    public static <T> List<T> parseCollection(String json, Class<T> clazz) {
+        final JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, clazz);
+        return OBJECT_MAPPER.readValue(json, javaType);
     }
 }
