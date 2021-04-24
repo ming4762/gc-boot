@@ -1,11 +1,11 @@
 package com.gc.starter.file.mongo.service;
 
-import com.gc.common.base.exception.IORuntimeException;
 import com.gc.common.base.exception.OperationNotSupportedException;
 import com.gc.file.common.common.ActualFileServiceRegisterName;
 import com.gc.file.common.constants.ActualFileServiceConstants;
 import com.gc.file.common.service.ActualFileService;
 import com.mongodb.client.gridfs.GridFSBuckets;
+import lombok.SneakyThrows;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -14,7 +14,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.lang.NonNull;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -40,14 +43,11 @@ public class ActualFileServiceMongoImpl implements ActualFileService {
      * @param filename 文件名
      * @return 文件id
      */
+    @SneakyThrows
     @Override
     public @NonNull
     String save(@NonNull File file, String filename) {
-        try {
-            return this.gridFsTemplate.store(new FileInputStream(file), filename).toString();
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
-        }
+        return this.gridFsTemplate.store(new FileInputStream(file), filename).toString();
     }
 
     /**
@@ -105,12 +105,11 @@ public class ActualFileServiceMongoImpl implements ActualFileService {
      * @param id           文件ID
      * @param outputStream 输出流
      */
+    @SneakyThrows
     @Override
     public void download(@NonNull String id, @NonNull OutputStream outputStream) {
         try (InputStream inputStream = this.download(id)) {
             IOUtils.copy(inputStream, outputStream);
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
         }
     }
 

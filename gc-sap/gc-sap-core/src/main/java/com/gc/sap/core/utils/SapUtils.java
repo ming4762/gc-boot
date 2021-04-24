@@ -1,14 +1,13 @@
 package com.gc.sap.core.utils;
 
-import com.gc.common.base.exception.*;
 import com.gc.sap.core.annotation.SapField;
 import com.gc.sap.core.model.SapModelField;
 import com.google.common.collect.Lists;
 import com.sap.conn.jco.JCoTable;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,23 +34,20 @@ public class SapUtils {
      * @author shizhongming
      * @return 数据
      */
+    @SneakyThrows
     public static <T> List<T> getDataFromSapTable(JCoTable table, Class<T> clazz) {
-        try {
-            // 获取实体类SAP属性信息
-            final List<SapModelField> sapModelFieldList = SapModelCache.getSapModelFieldList(clazz);
-            if (CollectionUtils.isEmpty(sapModelFieldList)) {
-                return Lists.newArrayList();
-            }
-            List<T> data = new ArrayList<>(table.getNumRows());
-            do {
-                // 循环添加每一条数据
-                data.add(SapUtils.createSapModel(clazz, sapModelFieldList, table));
-            } while (table.nextRow());
-
-            return data;
-        } catch (IntrospectionException e) {
-            throw new IntrospectionRuntimeException(e);
+        // 获取实体类SAP属性信息
+        final List<SapModelField> sapModelFieldList = SapModelCache.getSapModelFieldList(clazz);
+        if (CollectionUtils.isEmpty(sapModelFieldList)) {
+            return Lists.newArrayList();
         }
+        List<T> data = new ArrayList<>(table.getNumRows());
+        do {
+            // 循环添加每一条数据
+            data.add(SapUtils.createSapModel(clazz, sapModelFieldList, table));
+        } while (table.nextRow());
+
+        return data;
     }
 
     /**
@@ -62,28 +58,19 @@ public class SapUtils {
      * @param <T> 实体类类型
      * @return 实体类
      */
+    @SneakyThrows
     private static <T> T createSapModel(Class<T> clazz, List<SapModelField> sapModelFieldList, JCoTable table) {
-        try {
-            // 初始化实体类
-            T t = clazz.getDeclaredConstructor().newInstance();
-            for (SapModelField sapModelField : sapModelFieldList) {
-                final Field field = sapModelField.getField();
-                // 获取属性值
-                final SapField sapField = sapModelField.getSapField();
-                // 设置属性值
-                sapModelField.getPropertyDescriptor().getWriteMethod().invoke(t, SapUtils.getSapValue(table, sapField, field));
+        // 初始化实体类
+        T t = clazz.getDeclaredConstructor().newInstance();
+        for (SapModelField sapModelField : sapModelFieldList) {
+            final Field field = sapModelField.getField();
+            // 获取属性值
+            final SapField sapField = sapModelField.getSapField();
+            // 设置属性值
+            sapModelField.getPropertyDescriptor().getWriteMethod().invoke(t, SapUtils.getSapValue(table, sapField, field));
 
-            }
-            return t;
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new InstantiationRuntimeException(e);
         }
+        return t;
     }
 
     /**

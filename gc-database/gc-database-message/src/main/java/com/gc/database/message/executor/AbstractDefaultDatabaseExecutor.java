@@ -1,6 +1,5 @@
 package com.gc.database.message.executor;
 
-import com.gc.common.base.exception.SqlRuntimeException;
 import com.gc.common.base.utils.ReflectUtil;
 import com.gc.database.message.annotation.DatabaseField;
 import com.gc.database.message.constants.ExceptionConstant;
@@ -77,6 +76,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
      * 获取表格信息
      * @param types 类型
      */
+    @SneakyThrows
     @Override
     public @NonNull List<TableViewDO> listBaseTable(@NonNull DbConnectionConfig connectionConfig, @Nullable String tableNamePattern, TableTypeConstants... types) {
         ResultSet resultSet = null;
@@ -93,9 +93,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
             resultSet = connection.getMetaData().getTables(connection.getCatalog(), connection.getSchema(), tableNamePattern, typesStr);
             Map<String, Field> mapping = this.getDatabaseMapping(TableViewDO.class);
             return DatabaseUtils.resultSetToModel(resultSet, TableViewDO.class, mapping);
-        } catch (SQLException e) {
-            throw new SqlRuntimeException(e);
-        } finally {
+        }  finally {
             close(resultSet);
             this.dbConnectionProvider.returnConnection(connectionConfig, connection);
         }
@@ -107,6 +105,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
      * @param tableName 标明
      * @return 主键列表
      */
+    @SneakyThrows
     @Override
     public List<PrimaryKeyDO> listPrimaryKey(@NonNull DbConnectionConfig connectionConfig, String tableName)  {
         ResultSet resultSet = null;
@@ -121,8 +120,6 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
                 throw new SmartDatabaseException(ExceptionConstant.DATABASE_FILE_MAPPING_NOT_FOUND, PrimaryKeyDO.class.getName());
             }
             return DatabaseUtils.resultSetToModel(resultSet, PrimaryKeyDO.class, mapping);
-        } catch (SQLException e) {
-            throw new SqlRuntimeException(e);
         } finally {
             close(resultSet);
             this.dbConnectionProvider.returnConnection(connectionConfig, connection);
@@ -135,6 +132,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
      * @param tableName 表名
      * @return 外键列表
      */
+    @SneakyThrows
     @Override
     public List<ImportKeyDO> listImportedKeys(@NonNull DbConnectionConfig connectionConfig, String tableName){
         ResultSet resultSet = null;
@@ -149,8 +147,6 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
                 throw new SmartDatabaseException(ExceptionConstant.DATABASE_FILE_MAPPING_NOT_FOUND, ImportKeyDO.class.getName());
             }
             return DatabaseUtils.resultSetToModel(resultSet, ImportKeyDO.class, mapping);
-        } catch (SQLException e) {
-            throw new SqlRuntimeException(e);
         } finally {
             close(resultSet);
             this.dbConnectionProvider.returnConnection(connectionConfig, connection);
@@ -165,6 +161,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
      * @param approximate
      * @return
      */
+    @SneakyThrows
     @Override
     public List<IndexDO> listIndex(@NonNull DbConnectionConfig connectionConfig, String tableName, Boolean unique, Boolean approximate) {
         ResultSet resultSet = null;
@@ -185,9 +182,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
                 throw new SmartDatabaseException(ExceptionConstant.DATABASE_FILE_MAPPING_NOT_FOUND, IndexDO.class.getName());
             }
             return DatabaseUtils.resultSetToModel(resultSet, IndexDO.class, mapping);
-        } catch (SQLException e) {
-            throw new SqlRuntimeException(e);
-        } finally {
+        }  finally {
             close(resultSet);
             this.dbConnectionProvider.returnConnection(connectionConfig, connection);
         }
@@ -264,6 +259,7 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
      * @param tableName 表名
      * @return 列基本信息
      */
+    @SneakyThrows
     @Override
     public List<ColumnDO> listBaseColumn(@NonNull DbConnectionConfig connectionConfig, @NonNull String tableName) {
         ResultSet resultSet = null;
@@ -278,8 +274,6 @@ public abstract class AbstractDefaultDatabaseExecutor implements DatabaseExecuto
                 throw new SmartDatabaseException(ExceptionConstant.DATABASE_FILE_MAPPING_NOT_FOUND, ColumnBO.class.getName());
             }
             return DatabaseUtils.resultSetToModel(resultSet, ColumnDO.class, mapping);
-        } catch (SQLException sqlException) {
-            throw new SqlRuntimeException(sqlException);
         } finally {
             close(resultSet);
             this.dbConnectionProvider.returnConnection(connectionConfig, connection);

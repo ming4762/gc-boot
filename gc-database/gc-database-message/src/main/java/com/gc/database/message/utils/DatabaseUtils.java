@@ -1,12 +1,12 @@
 package com.gc.database.message.utils;
 
-import com.gc.common.base.exception.*;
 import com.gc.database.message.annotation.DatabaseField;
 import com.gc.database.message.constants.ExceptionConstant;
 import com.gc.database.message.converter.AutoConverter;
 import com.gc.database.message.converter.Converter;
 import com.gc.database.message.exception.SmartDatabaseException;
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 
@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -36,55 +35,44 @@ public class DatabaseUtils {
      * @param <T>
      * @return
      */
+    @SneakyThrows
     @NonNull
     public static <T> List<T> resultSetToModel(@NonNull ResultSet resultSet, @NonNull Class<T> clazz, @NonNull Map<String, Field> mapping) {
-        try {
-            final ResultSetMetaData metaData = resultSet.getMetaData();
-            final int columnCount = metaData.getColumnCount();
-            final List<T> modelList = Lists.newLinkedList();
-            while (resultSet.next()) {
-                final T model = clazz.getDeclaredConstructor().newInstance();
-                for (int i=1; i<=columnCount; i++) {
-                    final String name = metaData.getColumnName(i);
-                    final Field field = mapping.get(name);
-                    if (field != null) {
-                        Object value;
-                        final Class aClass = field.getType();
-                        if (aClass == Date.class) {
-                            value = resultSet.getTimestamp(i);
-                        } else if (aClass == Short.class) {
-                            value = resultSet.getShort(i);
-                        } else {
-                            value = resultSet.getObject(i);
-                        }
-                        if (value instanceof Short) {
-                            value = new Integer((Short)value);
-                        }
-                        if (Objects.nonNull(value)) {
-                            // 判断类型是否一致，如果不一致 使用转换器进行转换
-                            if (!Objects.equals(field.getType(), value.getClass())) {
-                                // 执行转换
-                                value = convertValue(field, value);
-                            }
-                            field.set(model, value);
-                        }
-
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+        final int columnCount = metaData.getColumnCount();
+        final List<T> modelList = Lists.newLinkedList();
+        while (resultSet.next()) {
+            final T model = clazz.getDeclaredConstructor().newInstance();
+            for (int i=1; i<=columnCount; i++) {
+                final String name = metaData.getColumnName(i);
+                final Field field = mapping.get(name);
+                if (field != null) {
+                    Object value;
+                    final Class aClass = field.getType();
+                    if (aClass == Date.class) {
+                        value = resultSet.getTimestamp(i);
+                    } else if (aClass == Short.class) {
+                        value = resultSet.getShort(i);
+                    } else {
+                        value = resultSet.getObject(i);
                     }
+                    if (value instanceof Short) {
+                        value = new Integer((Short)value);
+                    }
+                    if (Objects.nonNull(value)) {
+                        // 判断类型是否一致，如果不一致 使用转换器进行转换
+                        if (!Objects.equals(field.getType(), value.getClass())) {
+                            // 执行转换
+                            value = convertValue(field, value);
+                        }
+                        field.set(model, value);
+                    }
+
                 }
-                modelList.add(model);
             }
-            return modelList;
-        } catch (InstantiationException e) {
-           throw new InstantiationRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        } catch (SQLException e) {
-            throw new SqlRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
+            modelList.add(model);
         }
+        return modelList;
     }
 
     /**

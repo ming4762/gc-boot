@@ -1,9 +1,5 @@
 package com.gc.common.base.utils;
 
-import com.gc.common.base.exception.IllegalAccessRuntimeException;
-import com.gc.common.base.exception.InstantiationRuntimeException;
-import com.gc.common.base.exception.InvocationTargetRuntimeException;
-import com.gc.common.base.exception.NoSuchMethodRuntimeException;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -18,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,30 +40,21 @@ public class HttpServletUtils {
      * @param <T> 类型
      * @return 数据
      */
+    @SneakyThrows
     public static <T> T getDataFromRequestParameter(ServletRequest request, Class<T> clazz) {
-        try {
-            T result = clazz.getConstructor().newInstance();
-            final Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
-                    continue;
-                }
-                // 获取参数值
-                String value = request.getParameter(field.getName());
-                if (Objects.isNull(value)) {
-                    continue;
-                }
+        T result = clazz.getConstructor().newInstance();
+        final Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
+                continue;
             }
-            return result;
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new InstantiationRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
+            // 获取参数值
+            String value = request.getParameter(field.getName());
+            if (Objects.isNull(value)) {
+                continue;
+            }
         }
+        return result;
     }
 
     /**

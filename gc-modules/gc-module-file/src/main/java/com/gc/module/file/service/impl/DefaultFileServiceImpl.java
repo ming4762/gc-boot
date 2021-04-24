@@ -3,7 +3,6 @@ package com.gc.module.file.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gc.auth.core.utils.AuthUtils;
 import com.gc.common.base.exception.BaseException;
-import com.gc.common.base.exception.IORuntimeException;
 import com.gc.file.common.exception.SmartFileException;
 import com.gc.file.common.properties.SmartFileProperties;
 import com.gc.file.common.service.ActualFileService;
@@ -14,6 +13,7 @@ import com.gc.module.file.pojo.bo.SysFileBO;
 import com.gc.module.file.pojo.dto.SaveFileDTO;
 import com.gc.module.file.service.SysFileService;
 import com.gc.starter.crud.service.impl.BaseServiceImpl;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,7 +29,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
@@ -283,11 +282,10 @@ public class DefaultFileServiceImpl extends BaseServiceImpl<SysFileMapper, SysFi
      * @param file 文件信息
      * @return 文件ID
      */
+    @SneakyThrows
     private String saveActualFile(SysFileBO file) {
         try (InputStream inputStream = file.getInputStream()) {
             return this.getActualFileService(file.getFile().getHandlerType()).save(inputStream, file.getFile().getFileName());
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
         }
 
     }

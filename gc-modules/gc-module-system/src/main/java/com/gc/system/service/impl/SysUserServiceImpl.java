@@ -5,9 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gc.auth.core.data.RestUserDetails;
 import com.gc.auth.core.utils.AuthUtils;
 import com.gc.common.base.constants.TransactionManagerConstants;
-import com.gc.common.base.exception.IllegalAccessRuntimeException;
-import com.gc.common.base.exception.InvocationTargetRuntimeException;
-import com.gc.common.base.exception.NoSuchMethodRuntimeException;
 import com.gc.common.base.utils.security.Md5Utils;
 import com.gc.starter.crud.constants.UserPropertyConstants;
 import com.gc.starter.crud.service.impl.BaseServiceImpl;
@@ -21,6 +18,7 @@ import com.gc.system.service.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import lombok.SneakyThrows;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -184,42 +181,35 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, SysUserPO
      * @param resource 原
      * @param <T> 目标类型
      */
+    @SneakyThrows
     private <T> void setWithUser(@NonNull List<T> resource, boolean withCreateUser, boolean withUpdateUser) {
         if (!resource.isEmpty()) {
             Set<Long> userIdSet = Sets.newHashSet();
-            try {
+            for (T item : resource) {
+                if (withCreateUser) {
+                    // 获取创建人员ID
+                    userIdSet.add((Long) PropertyUtils.getProperty(item, UserPropertyConstants.CREATE_USER_ID.getName()));
+                }
+                if (withUpdateUser) {
+                    // 获取创建人员ID
+                    userIdSet.add((Long) PropertyUtils.getProperty(item, UserPropertyConstants.UPDATE_USER_ID.getName()));
+                }
+            }
+            userIdSet = userIdSet.stream().filter(item -> !Objects.isNull(item)).collect(Collectors.toSet());
+            if (!userIdSet.isEmpty()) {
+                // 查询人员信息
+                Map<Long, SysUserPO> userMap = this.listByIds(userIdSet).stream()
+                        .collect(Collectors.toMap(SysUserPO :: getUserId, item -> item));
                 for (T item : resource) {
                     if (withCreateUser) {
-                        // 获取创建人员ID
-                        userIdSet.add((Long) PropertyUtils.getProperty(item, UserPropertyConstants.CREATE_USER_ID.getName()));
+                        Long createUserId = (Long) PropertyUtils.getProperty(item, UserPropertyConstants.CREATE_USER_ID.getName());
+                        PropertyUtils.setProperty(item, UserPropertyConstants.CREATE_USER.getName(), userMap.get(createUserId));
                     }
                     if (withUpdateUser) {
-                        // 获取创建人员ID
-                        userIdSet.add((Long) PropertyUtils.getProperty(item, UserPropertyConstants.UPDATE_USER_ID.getName()));
+                        Long updateUserId = (Long) PropertyUtils.getProperty(item, UserPropertyConstants.UPDATE_USER_ID.getName());
+                        PropertyUtils.setProperty(item, UserPropertyConstants.UPDATE_USER.getName(), userMap.get(updateUserId));
                     }
                 }
-                userIdSet = userIdSet.stream().filter(item -> !Objects.isNull(item)).collect(Collectors.toSet());
-                if (!userIdSet.isEmpty()) {
-                    // 查询人员信息
-                    Map<Long, SysUserPO> userMap = this.listByIds(userIdSet).stream()
-                            .collect(Collectors.toMap(SysUserPO :: getUserId, item -> item));
-                    for (T item : resource) {
-                        if (withCreateUser) {
-                            Long createUserId = (Long) PropertyUtils.getProperty(item, UserPropertyConstants.CREATE_USER_ID.getName());
-                            PropertyUtils.setProperty(item, UserPropertyConstants.CREATE_USER.getName(), userMap.get(createUserId));
-                        }
-                        if (withUpdateUser) {
-                            Long updateUserId = (Long) PropertyUtils.getProperty(item, UserPropertyConstants.UPDATE_USER_ID.getName());
-                            PropertyUtils.setProperty(item, UserPropertyConstants.UPDATE_USER.getName(), userMap.get(updateUserId));
-                        }
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                throw new IllegalAccessRuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new InvocationTargetRuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new NoSuchMethodRuntimeException(e);
             }
         }
     }
