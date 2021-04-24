@@ -5,23 +5,23 @@
     <parent>
         <groupId>com.gc</groupId>
         <artifactId>gc-boot</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>1.0.5-SNAPSHOT</version>
     </parent>
     <artifactId>gc-samples</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <name>gc-samples</name>
     <description>示例模块</description>
     <packaging>pom</packaging>
 
-    <properties>
-    </properties>
-
     <modules>
-        <module>gc-sample-system</module>
+        <module>gc-samples-crud</module>
     </modules>
 
+    <properties>
+    </properties>
     <dependencies>
 
     </dependencies>
+
 
 </project>
