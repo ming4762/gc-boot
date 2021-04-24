@@ -1,8 +1,5 @@
 package com.gc.starter.crud.advice;
 
-import com.gc.common.base.exception.IllegalAccessRuntimeException;
-import com.gc.common.base.exception.IntrospectionRuntimeException;
-import com.gc.common.base.exception.InvocationTargetRuntimeException;
 import com.gc.common.base.utils.ReflectUtil;
 import com.gc.starter.crud.query.QueryParameter;
 import com.google.common.collect.Sets;
@@ -14,9 +11,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
@@ -25,6 +24,7 @@ import java.util.Set;
  * 2020/3/14 6:44 下午
  */
 @ControllerAdvice
+@Deprecated
 public class ParameterConvertRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public boolean supports(@NonNull MethodParameter methodParameter, @NonNull Type type, @NonNull Class<? extends HttpMessageConverter<?>> aClass) {
@@ -76,28 +76,21 @@ public class ParameterConvertRequestBodyAdvice implements RequestBodyAdvice {
      * @param parameter 参数
      * @param clazz 实体类类型
      */
+    @SneakyThrows
     @SuppressWarnings("rawtypes")
     private void addParameter(QueryParameter parameter, Class<? extends QueryParameter> clazz) {
         final Set<Field> fieldSet = Sets.newHashSet();
         ReflectUtil.getAllFields(clazz, fieldSet);
-        try {
-            for (Field field : fieldSet) {
-                if (!Modifier.isFinal(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
-                    String name = field.getName();
-                    if (parameter.containsKey(name)) {
-                        Object value = parameter.get(name);
-                        parameter.remove(name);
-                        PropertyDescriptor propertyDescriptor = new PropertyDescriptor(name, clazz);
-                        propertyDescriptor.getWriteMethod().invoke(parameter, value);
-                    }
+        for (Field field : fieldSet) {
+            if (!Modifier.isFinal(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+                String name = field.getName();
+                if (parameter.containsKey(name)) {
+                    Object value = parameter.get(name);
+                    parameter.remove(name);
+                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(name, clazz);
+                    propertyDescriptor.getWriteMethod().invoke(parameter, value);
                 }
             }
-        } catch (IllegalAccessException e) {
-           throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (IntrospectionException e) {
-            throw new IntrospectionRuntimeException(e);
         }
     }
 

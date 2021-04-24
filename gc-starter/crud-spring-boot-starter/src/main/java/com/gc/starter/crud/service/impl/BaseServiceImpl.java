@@ -8,16 +8,13 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gc.common.base.exception.IllegalAccessRuntimeException;
-import com.gc.common.base.exception.IntrospectionRuntimeException;
-import com.gc.common.base.exception.InvocationTargetRuntimeException;
-import com.gc.common.base.exception.NoSuchMethodRuntimeException;
 import com.gc.common.base.utils.ReflectUtil;
 import com.gc.starter.crud.constants.UserPropertyConstants;
 import com.gc.starter.crud.mapper.CrudBaseMapper;
 import com.gc.starter.crud.model.BaseModel;
 import com.gc.starter.crud.model.Sort;
 import com.gc.starter.crud.query.PageQueryParameter;
+import com.gc.starter.crud.query.PageSortQuery;
 import com.gc.starter.crud.service.BaseService;
 import com.gc.starter.crud.utils.CrudPageHelper;
 import com.gc.starter.crud.utils.CrudUtils;
@@ -25,6 +22,7 @@ import com.gc.starter.crud.utils.IdGenerator;
 import com.gc.starter.crud.utils.PageCache;
 import com.github.pagehelper.Page;
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -32,11 +30,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
@@ -129,6 +125,7 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      */
     @Nullable
     @Override
+    @Deprecated
     public T get(@NonNull T model) {
         final List<String> keyList = this.getKeyList();
         if (keyList.isEmpty()) {
@@ -211,19 +208,13 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      * @param entity 实体类
      * @param tableInfo 表信息
      */
+    @SneakyThrows
     private void setNumberId(@NonNull T entity, @NonNull TableInfo tableInfo) {
         final IdType idType = tableInfo.getIdType();
         if (idType.getKey() == IdType.ASSIGN_ID.getKey() && Number.class.isAssignableFrom(tableInfo.getKeyType())) {
-            try {
-                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(tableInfo.getKeyProperty(), entity.getClass());
-                propertyDescriptor.getWriteMethod().invoke(entity, IdGenerator.nextId());
-            } catch (IllegalAccessException e) {
-                throw new IllegalAccessRuntimeException(e);
-            } catch (IntrospectionException e) {
-                throw new IntrospectionRuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new InvocationTargetRuntimeException(e);
-            }
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(tableInfo.getKeyProperty(), entity.getClass());
+            propertyDescriptor.getWriteMethod().invoke(entity, IdGenerator.nextId());
+
         }
     }
 
@@ -254,8 +245,28 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      * @return 查询结果
      */
     @Override
+    @Deprecated
     public @NonNull List<T> list(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageQueryParameter<String, Object> parameter, @NonNull Boolean paging) {
         this.analysisOrder(queryWrapper, parameter, paging);
+        final Page<?> page = PageCache.get();
+        if (page != null) {
+            CrudPageHelper.setPage(page);
+        }
+        return super.list(queryWrapper);
+    }
+
+    /**
+     * 查询函数
+     * @param queryWrapper 查询参数
+     * @param parameter 原始参数
+     * @param paging 是否分页
+     * @return 查询结果
+     */
+    @Override
+    public List<T> list(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageSortQuery parameter, boolean paging) {
+        if (!paging && org.apache.commons.lang3.StringUtils.isNotBlank(parameter.getSortName())) {
+            this.analysisOrder(queryWrapper, parameter.getSortName(), parameter.getSortOrder());
+        }
         final Page<?> page = PageCache.get();
         if (page != null) {
             CrudPageHelper.setPage(page);
@@ -381,6 +392,7 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      * @param parameter 参数
      * @param paging 是否分页
      */
+    @Deprecated
     public void analysisOrder(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageQueryParameter<String, Object> parameter, boolean paging) {
         final String sortName = parameter.getSortName();
         // 如果灭有分页且存在排序字段手动进行排序
@@ -397,6 +409,26 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
                     }
                 });
             }
+        }
+    }
+
+    /**
+     * 解析排序
+     * @param queryWrapper 查询参数
+     * @param sortName 排序字段
+     * @param sortOrder 排序方向
+     */
+    public void analysisOrder(@NonNull QueryWrapper<T> queryWrapper, String sortName, String sortOrder) {
+        final Class<? extends BaseModel> clazz = this.currentModelClass();
+        final List<Sort> sortList = CrudUtils.analysisOrder(sortName, sortOrder, clazz);
+        if (!sortList.isEmpty()) {
+            sortList.forEach(sort -> {
+                if (SORT_ASC.equalsIgnoreCase(sort.getOrder())) {
+                    queryWrapper.orderByAsc(sort.getDbName());
+                } else {
+                    queryWrapper.orderByDesc(sort.getDbName());
+                }
+            });
         }
     }
 
@@ -437,56 +469,28 @@ public abstract class BaseServiceImpl<K extends CrudBaseMapper<T>, T extends Bas
      * @param model 实体类
      * @param userId 用户ID
      */
+    @SneakyThrows
     private void setCreateUserId(T model, Long userId) {
-        try {
-            PropertyUtils.setProperty(model, UserPropertyConstants.CREATE_USER_ID.getName(), userId);
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        }
+        PropertyUtils.setProperty(model, UserPropertyConstants.CREATE_USER_ID.getName(), userId);
     }
 
     /**
      * 设置创建时间
      * @param model 实体类
      */
+    @SneakyThrows
     private void setCreateTime(T model) {
-        try {
-            PropertyUtils.setProperty(model, UserPropertyConstants.CREATE_TIME.getName(), LocalDateTime.now());
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        }
+        PropertyUtils.setProperty(model, UserPropertyConstants.CREATE_TIME.getName(), LocalDateTime.now());
     }
 
+    @SneakyThrows
     private void setUpdateUserId(T model, Long userId) {
-        try {
-            PropertyUtils.setProperty(model, UserPropertyConstants.UPDATE_USER_ID.getName(), userId);
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        }
+        PropertyUtils.setProperty(model, UserPropertyConstants.UPDATE_USER_ID.getName(), userId);
     }
 
+    @SneakyThrows
     private void setUpdateTime(T model) {
-        try {
-            PropertyUtils.setProperty(model, UserPropertyConstants.UPDATE_TIME.getName(), LocalDateTime.now());
-        } catch (IllegalAccessException e) {
-            throw new IllegalAccessRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetRuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new NoSuchMethodRuntimeException(e);
-        }
+        PropertyUtils.setProperty(model, UserPropertyConstants.UPDATE_TIME.getName(), LocalDateTime.now());
     }
 
     /**

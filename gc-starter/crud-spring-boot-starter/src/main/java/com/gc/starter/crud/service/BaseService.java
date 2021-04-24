@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gc.starter.crud.model.BaseModel;
 import com.gc.starter.crud.query.PageQueryParameter;
+import com.gc.starter.crud.query.PageSortQuery;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -22,6 +23,7 @@ public interface BaseService<T extends BaseModel> extends IService<T> {
      * @return 删除的数量
      */
     @NonNull
+    @Deprecated
     Integer delete(@NonNull T model);
 
     /**
@@ -30,6 +32,7 @@ public interface BaseService<T extends BaseModel> extends IService<T> {
      * @return 删除数量
      */
     @NonNull
+    @Deprecated
     Integer batchDelete(@NonNull List<T> modelList);
 
     /**
@@ -38,6 +41,7 @@ public interface BaseService<T extends BaseModel> extends IService<T> {
      * @return 实体类
      */
     @Nullable
+    @Deprecated
     T get(@NonNull T model);
 
     /**
@@ -88,8 +92,17 @@ public interface BaseService<T extends BaseModel> extends IService<T> {
      * @return 查询结果
      */
     @NonNull
+    @Deprecated
     List<T> list(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageQueryParameter<String, Object> parameter, @NonNull Boolean paging);
 
+    /**
+     * 查询函数
+     * @param queryWrapper 查询参数
+     * @param parameter 原始参数
+     * @param paging 是否分页
+     * @return 查询结果
+     */
+    List<T> list(@NonNull QueryWrapper<T> queryWrapper, @NonNull PageSortQuery parameter, boolean paging);
     /**
      * 批量保存带有创建人员信息
      * @param modelList 实体类

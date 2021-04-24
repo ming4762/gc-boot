@@ -13,6 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Deprecated
 @EqualsAndHashCode(callSuper = true)
 public class PageQueryParameter<K, V> extends SortQueryParameter<K, V> {
     private static final long serialVersionUID = -2738378597906345854L;

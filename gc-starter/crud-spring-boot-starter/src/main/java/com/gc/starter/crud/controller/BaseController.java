@@ -25,6 +25,7 @@ public abstract class BaseController<K extends BaseService<T>, T extends BaseMod
     /**
      * 删除接口
      */
+    @Deprecated
     public Result<Integer> delete(@RequestBody T model) {
         return Result.success(this.service.delete(model));
     }
@@ -55,6 +56,7 @@ public abstract class BaseController<K extends BaseService<T>, T extends BaseMod
      * @param modelList 实体列表
      * @return 删除数量
      */
+    @Deprecated
     public Result<Integer> batchDelete(@RequestBody List<T> modelList) {
         return Result.success(this.service.batchDelete(modelList));
     }

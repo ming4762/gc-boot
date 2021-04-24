@@ -8,6 +8,7 @@ import com.gc.starter.crud.model.BaseModel;
 import com.gc.starter.crud.model.Sort;
 import com.gc.starter.crud.query.PageQuery;
 import com.gc.starter.crud.query.PageQueryParameter;
+import com.gc.starter.crud.query.PageSortQuery;
 import com.gc.starter.crud.service.BaseService;
 import com.gc.starter.crud.utils.CrudUtils;
 import com.gc.starter.crud.utils.PageCache;
@@ -46,6 +47,7 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
      * @param parameter 查询参数
      * @return 查询结果集
      */
+    @Deprecated
     public Result<Object> list(@RequestBody PageQueryParameter<String, Object> parameter) {
         final Page<T> page = this.doPage(parameter);
         PageCache.set(page);
@@ -62,11 +64,32 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
     }
 
     /**
+     * list查询方法
+     * @param parameter 参数
+     * @return 查询结果
+     */
+    public Result<Object> list(@NonNull PageSortQuery parameter) {
+        final Page<T> page = this.doPage(parameter);
+        PageCache.set(page);
+        final QueryWrapper<T> queryWrapper = CrudUtils.createQueryWrapperFromParameters(parameter.getParameter(), this.getModelType());
+        String keyword = parameter.getKeyword();
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
+            this.addKeyword(queryWrapper, keyword);
+        }
+        final List<T> data = this.service.list(queryWrapper, parameter, page != null);
+        if (page != null) {
+            return Result.success(new PageData<>(data, page.getTotal()));
+        }
+        return Result.success(data);
+    }
+
+    /**
      * 获取单一实体方法
      * @author jackson
      * @param model 包含主键信息的model
      * @return 结果
      */
+    @Deprecated
     public Result<T> get(@RequestBody T model) {
         return Result.success(this.service.get(model));
     }
@@ -86,8 +109,18 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
      * @return 分页信息
      */
     @Nullable
+    @Deprecated
     protected Page<T> doPage(@NonNull PageQueryParameter<String, Object> parameter) {
         return this.createPage(parameter.getLimit(), parameter.getOffset(), parameter.getPage(), parameter.getSortName(), parameter.getSortOrder());
+    }
+
+    /**
+     * 执行分页
+     * @param parameter 参数信息
+     * @return 分页信息
+     */
+    protected Page<T> doPage(@NonNull PageSortQuery parameter) {
+        return  this.createPage(parameter.getLimit(), parameter.getOffset(), parameter.getPage(), parameter.getSortName(), parameter.getSortOrder());
     }
 
     /**
@@ -95,6 +128,7 @@ public abstract class BaseQueryController<K extends BaseService<T>, T extends Ba
      * @param parameter 分页参数
      * @return 分页对象
      */
+    @Deprecated
     protected Page<T> doPage(@NonNull PageQuery parameter) {
         return this.createPage(parameter.getLimit(), parameter.getOffset(), parameter.getPage(), parameter.getSortName(), parameter.getSortOrder());
     }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @EqualsAndHashCode(callSuper = false)
+@Deprecated
 public class PageQuery implements Serializable {
 
     private static final long serialVersionUID = -149737684094213921L;
